@@ -1,0 +1,18 @@
+Create project
+- npm create vite@latest frontend -- --template react-ts
+-c d frontend
+- npm install
+
+Add dependencies
+- npm install axios react-router-dom
+
+Make sure to have node version 22
+- nvm install 22
+- nvm use 22
+- node -v
+
+Run application
+- npm run dev
+
+Download material-ui modules
+npm i @material-ui/core @mui/icons-material @mui/material @mui/styled-engine @emotion/react @emotion/styled
