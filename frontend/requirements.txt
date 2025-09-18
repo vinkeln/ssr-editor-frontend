@@ -16,3 +16,6 @@ Run application
 
 Download material-ui modules
 npm i @material-ui/core @mui/icons-material @mui/material @mui/styled-engine @emotion/react @emotion/styled
+
+Download richtexteditor
+npm install @syncfusion/ej2-react-richtexteditor
