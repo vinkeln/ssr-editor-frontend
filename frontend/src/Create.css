@@ -1,0 +1,51 @@
+/* Styling for the create document page */
+.create-page {
+  background-color: #f0f8ff;
+}
+
+.create-page .create-docs-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: black;
+}
+.button-section {
+  margin-top: 8rem;
+}
+
+/* Gör editorn hög och luftig */
+.editor-content {
+  background: #fff;
+  min-height: 600px; /* öka höjden så det liknar Google Docs */
+  padding: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Snygga till knapparna */
+.button-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem; /* istället för långt ner */
+}
+
+.save-button, .cancel-button {
+  background: #1976d2;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cancel-button {
+  background: #999;
+}
+
+.save-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
