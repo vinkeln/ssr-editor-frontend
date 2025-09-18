@@ -10,13 +10,12 @@
   color: black;
 }
 .button-section {
-  margin-top: 8rem;
+  margin-top: -3rem;
 }
-
-/* Gör editorn hög och luftig */
 .editor-content {
   background: #fff;
-  min-height: 600px; /* öka höjden så det liknar Google Docs */
+  color: black;
+  min-height: 500px; /* increase height like google docs */
   padding: 2rem;
   font-size: 1rem;
   line-height: 1.6;
@@ -24,11 +23,10 @@
   border: 1px solid #ccc;
 }
 
-/* Snygga till knapparna */
 .button-section {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem; /* istället för långt ner */
+  margin-bottom: 1rem;
 }
 
 .save-button, .cancel-button {
