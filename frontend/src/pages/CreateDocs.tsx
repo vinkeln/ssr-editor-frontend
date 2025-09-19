@@ -49,20 +49,17 @@ function CreateDocs() {
 
     return (
         <div className="create-docs-container">
-            <h1>Create Document</h1>
-            
-            <div className="document-form">
-                <div className="title-section">
-                    <label htmlFor="document-title">Document Title:</label>
-                    <input
-                        id="document-title"
-                        type="text"
-                        placeholder="Enter document title"
-                        value={documentTitle}
-                        onChange={(e) => setDocumentTitle(e.target.value)}
-                    />
+            <div className="create-docs-title">
+                <input
+                    id="document-title"
+                    type="text"
+                    placeholder="Untitled Document"
+                    value={documentTitle}
+                    onChange={(e) => setDocumentTitle(e.target.value)}
+                    className="document-title-input"
+                />
                 </div>
-
+            
                 <div className="editor-section">
                     <div className="button-section">
                         <button
@@ -91,7 +88,6 @@ function CreateDocs() {
                     />
                     </div>
             </div>
-        </div>
     );
 }
 
