@@ -6,7 +6,7 @@ function HomePage() {
     <>
 
 
-      <h1>Home Page</h1>
+      <h1 className="home-title">Home Page</h1>
 
     </>
   );
