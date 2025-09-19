@@ -7,7 +7,7 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 function CreateDocs() {
-    const [documentTitle, setDocumentTitle] = useState<string>("");
+    const [documentTitle, setDocumentTitle] = useState<string>("Untitled Document");
     const [editorState, setEditorState] = useState<EditorState>(
         EditorState.createEmpty()
     );
@@ -50,14 +50,25 @@ function CreateDocs() {
     return (
         <div className="create-docs-container">
             <div className="create-docs-title">
-                <input
+               <input
                     id="document-title"
                     type="text"
-                    placeholder="Untitled Document"
                     value={documentTitle}
                     onChange={(e) => setDocumentTitle(e.target.value)}
+                    onFocus={() => {
+                        // Clear the default title when the user focuses on the input ("").
+                        if (documentTitle === "Untitled Document") {
+                        setDocumentTitle("");
+                        }
+                    }}
+                    // If the field is left empty, set it back to "Untitled Document".
+                    onBlur={() => {
+                        if (documentTitle.trim() === "") {
+                        setDocumentTitle("Untitled Document");
+                        }
+                    }}
                     className="document-title-input"
-                />
+                    />
                 </div>
             
                 <div className="editor-section">
