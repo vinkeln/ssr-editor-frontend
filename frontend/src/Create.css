@@ -3,24 +3,33 @@
   background-color: #f0f8ff;
 }
 
-.create-page .create-docs-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  color: black;
+.create-docs-title {
+  margin-bottom: 2rem; /* Space below the title */
 }
-.button-section {
-  margin-top: -3rem;
+
+/* Styling for the document title input field */
+.document-title-input {
+  font-size: 1.5rem;
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #5e5e5e;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.editor-content {
-  background: #fff;
-  color: black;
-  min-height: 500px; /* increase height like google docs */
-  padding: 2rem;
-  font-size: 1rem;
-  line-height: 1.6;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+
+/* Placeholder styling for the input field */
+.document-title-input::placeholder {
+  color: #000000;
+  opacity: 1;
+}
+
+/* Focus state styling for the input field (Typing) */
+.document-title-input:focus {
+  border-color: #000000;   /* colored border on focus */
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* An glow effect */
 }
 
 .button-section {
@@ -30,7 +39,7 @@
 }
 
 .save-button, .cancel-button {
-  background: #1976d2;
+  background: #727272;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -40,10 +49,47 @@
 }
 
 .cancel-button {
-  background: #999;
+  background: #727272;
 }
 
 .save-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+  background: #a5a5a5;
+  cursor: not-allowed; /* Indicate disabled state */ 
 }
+
+/* Toolbar and editor styling react-draft-wysiwyg */
+.editor-toolbar {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #000000;
+  padding: 4px;
+  margin-bottom: 1rem;
+}
+
+.rdw-option-wrapper:hover {
+  background: #e6e6e6;
+}
+
+.rdw-option-active {
+  background: #e5efff;
+  border: 1px solid #b6d3ff;
+}
+
+.create-page .create-docs-container {
+  background: rgb(255, 255, 255);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: black;
+}
+.button-section {
+  margin-top: -3rem;
+}
+.editor-content {
+  color: black;
+  min-height: 500px; /* increase height like google docs */
+  padding: 1rem;
+  line-height: 0.6;
+  border-radius: 4px;
+  border: 1px solid #000000;
+}
+
