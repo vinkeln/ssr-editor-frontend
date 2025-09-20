@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from "react-router-dom";
-import "./App.css";
+import "./styles/App.css";
 import Header from "./includes/Header";
+import Footer from "./includes/Footer";
 import HomePage from "./pages/HomePage";
 import CreateDocs from "./pages/CreateDocs";
 import SavedDocs from "./pages/SavedDocs";
@@ -20,6 +21,7 @@ function App() {
         <Route path="/create" element={<CreateDocs />} />
         <Route path="/saved" element={<SavedDocs />} />
       </Routes>
+      <Footer />
     </>
   );
 }
