@@ -8,7 +8,7 @@ import SavedDocs from "./pages/SavedDocs";
 
 function App() {
   return (
-    <>
+    <div className="app-container">
       <Header />
       <nav style={{ marginBottom: "1rem" }}>
         <Link to="/">Home</Link> |{" "}
@@ -16,13 +16,15 @@ function App() {
         <Link to="/saved">Saved Documents</Link>
       </nav>
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/create" element={<CreateDocs />} />
-        <Route path="/saved" element={<SavedDocs />} />
-      </Routes>
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/create" element={<CreateDocs />} />
+          <Route path="/saved" element={<SavedDocs />} />
+        </Routes>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 
