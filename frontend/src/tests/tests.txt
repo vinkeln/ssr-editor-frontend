@@ -1,0 +1,40 @@
+Install (from scratch)
+- npm install -D vitest @vitest/ui jsdom
+npm install -D @testing-library/react @testing-library/jest-dom @testing-library/user-event
+
+Folder-structure
+- frontend/
+├── vite.config.ts          # Vitest configuration
+├── src/
+│   ├── test-setup.ts       # Test setup file
+│   └── tests/
+│       └── *.test.tsx      # tests
+
+Commands
+- npm test (Run tests)
+- npm run test:run (Runs the test one time)
+
+vite.config.ts
+- Vitest configuration 
+- Makes except, describe, it global
+- jsdom simulates webb environment for react components
+- setupFiles points to files that runs before every test
+
+src/test-setup.ts
+- Runs automatic before all tests
+- import '@testing-library' adds to DOM such as 'toBeInTheDocumnet()', 'toBeDisabled()'
+
+vitest
+- Build for Vite
+- Uses same API as jest
+- Graphical test view with --ui flag
+
+package.json
+-add:
+{
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui"
+  }
+}
