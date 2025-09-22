@@ -4,6 +4,7 @@ import Header from "./includes/Header";
 import HomePage from "./pages/HomePage";
 import CreateDocs from "./pages/CreateDocs";
 import SavedDocs from "./pages/SavedDocs";
+import FilmsList from "./pages/FilmsList";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/create" element={<CreateDocs />} />
         <Route path="/saved" element={<SavedDocs />} />
+        <Route path="/films" element={<FilmsList />} /> 
       </Routes>
     </>
   );
