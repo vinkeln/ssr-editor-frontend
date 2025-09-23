@@ -1,6 +1,6 @@
 /* Document title input component with focus and blur handling */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface DocumentTitleInputProps {
   title: string;
@@ -9,6 +9,10 @@ interface DocumentTitleInputProps {
 
 function DocumentTitleInput({ title, onTitleChange }: DocumentTitleInputProps) {
   const [localTitle, setLocalTitle] = useState(title);
+
+  useEffect(() => {
+    setLocalTitle(title);
+  }, [title]);
 
   const handleFocus = () => {
     if (localTitle === "Untitled Document") {

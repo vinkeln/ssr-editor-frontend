@@ -1,22 +1,24 @@
 /* Saved documents with localStorage page */
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import type { Document } from "../types/document";
 
-interface Document {
-    id: number;
-    title: string;
-    content: string;
-    createdAt: string;
-}
+
 
 function SavedDocs() {
   const [docs, setDocs] = useState<Document[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedDocs = JSON.parse(localStorage.getItem("docs") || "[]");
     setDocs(storedDocs);
   }, []);
+
+  const editDocument = (document: Document) => {
+    navigate('/create', { state: { editMode: true, document } });
+  }
 
   return (
     <div className="saved-docs-container">
@@ -35,6 +37,10 @@ function SavedDocs() {
                 >
                     <strong>{document.title}</strong> <br />
                     <p>{document.createdAt}</p>
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      editDocument(document);
+                    }}>Redigera</button>
                 </li>
             ))}
           </ul>
