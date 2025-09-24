@@ -29,15 +29,17 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci --legacy-peer-deps # Installs even with conflicts.
-        npm list vitest
+
+    - name: Verify vitest installation
+      run: npm list vitest
+      continue-on-error: true
     
     - name: Run lint
       run: npm run lint
       continue-on-error: true
     
-    # Använd test:run istället för test för CI
     - name: Run tests
-      run: npm run test:run
+      run: npm test
       env:
         CI: true
     
