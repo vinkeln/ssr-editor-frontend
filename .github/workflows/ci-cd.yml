@@ -27,7 +27,9 @@ jobs:
         cache-dependency-path: 'frontend/package-lock.json'
     
     - name: Install dependencies
-      run: npm ci --legacy-peer-deps # Installs even with conflicts.
+      run: |
+        npm ci --legacy-peer-deps # Installs even with conflicts.
+        npm list vitest
     
     - name: Run lint
       run: npm run lint
