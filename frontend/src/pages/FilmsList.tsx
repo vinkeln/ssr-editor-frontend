@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 interface Film {
   _id?: string;
   title?: string;
-  [key: string]: any; // fallback if your films have other fields
+  [key: string]: unknown; // fallback if your films have other fields
 }
 
 function FilmsList() {
@@ -21,8 +21,8 @@ function FilmsList() {
         const data = await response.json();
         console.log("Fetched films:", data);
         setFilms(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
         setLoading(false);
       }

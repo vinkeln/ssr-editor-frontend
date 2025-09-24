@@ -10,20 +10,24 @@ const ListPage = () =>{
       try {
         const response = await axios.get('http://localhost:1337/list');
         setData(response.data);
-        setLoading(false);
       } catch (error) {
-        console.error('Fel vid hämtning:', error);
-        setLoading(false);
-      }
-    };
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Flytta till finally
+        }
+      };
 
     fetchData();
   }, []);
 
+  if (loading) {
+    return <div>Loading data...</div>;
+  }
+
   return (
     <div>
         <h1>Data List</h1>
-        <p>Antal: {data.length}</p>
+        <p>Count: {data.length}</p>
 
       {JSON.stringify(data, null, 2)}
     </div>
