@@ -13,20 +13,20 @@ function App() {
     <div className="app-container">
       <Header />
       <nav style={{ marginBottom: "1rem" }}>
-        <Link to="/ssr-editor-frontend/">Home</Link> |{" "}
+        <Link to="/">Home</Link> |{" "}
         <Link to="/create">Create Document</Link> |{" "}
-          <Link to="/saved">Saved Documents</Link> |{" "}
-        <Link to="/ssr-editor-frontend/list">List Documents</Link> |{" "}
-        <Link to="/ssr-editor-frontend/films">Films</Link>
+        <Link to="/saved">Saved Documents</Link> |{" "}
+        <Link to="/list">List Documents</Link> |{" "}
+        <Link to="/films">Films</Link>
       </nav>
 
       <main className="main-content">
         <Routes>
-          <Route path="/ssr-editor-frontend/" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/create" element={<CreateDocs />} />
           <Route path="/saved" element={<SavedDocs />} />
-          <Route path="/ssr-editor-frontend/films" element={<FilmsList />} />
-          <Route path="/ssr-editor-frontend/list" element={<ListPage />} />
+          <Route path="/films" element={<FilmsList />} />
+          <Route path="/list" element={<ListPage />} />
         </Routes>
       </main>
       <Footer />
