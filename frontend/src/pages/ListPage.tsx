@@ -12,7 +12,6 @@ const ListPage = () => {
       try {
         const response = await axios.get('/list');
         setData(response.data);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to fetch data');
