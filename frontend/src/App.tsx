@@ -16,7 +16,8 @@ function App() {
         <Link to="/">Home</Link> |{" "}
         <Link to="/create">Create Document</Link> |{" "}
         <Link to="/saved">Saved Documents</Link> |{" "}
-        <Link to="/list">List Documents</Link>
+        <Link to="/list">List Documents</Link> |{" "}
+        <Link to="/films">Films</Link>
       </nav>
 
       <main className="main-content">
@@ -24,7 +25,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/create" element={<CreateDocs />} />
           <Route path="/saved" element={<SavedDocs />} />
-          <Route path="/films" element={<FilmsList />} /> 
+          <Route path="/films" element={<FilmsList />} />
           <Route path="/list" element={<ListPage />} />
         </Routes>
       </main>
