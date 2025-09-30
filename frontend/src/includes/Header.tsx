@@ -1,71 +1,66 @@
-// Filename - Header.js
+// Filename - Header.tsx
 
+import { Link } from "react-router-dom";
 // importing material UI components
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-// import Box from "@material-ui/core/Box/Box";
+import "../styles/Header.scss";
 
 export default function Header() {
     return (
-        <AppBar position="static">
-            <Toolbar>
-                {/*Inside the IconButton, we 
-                    can render various icons*/}
-                <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="menu"
-                    sx={{ mr: 2 }}
-                >
-                    {/*This is a simple Menu 
-                      Icon wrapped in Icon */}
-                    <MenuIcon />
-                </IconButton>
-                {/* The Typography component applies 
-                     default font weights and sizes */}
+        <AppBar position="static" className="header">
 
-                <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{ flexGrow: 1, color: "yellow" }}
-                >
-                    Group L & J Header
-                </Typography>
-                    <Button 
-                    color="inherit"
-                    sx={{ 
-                        color: "white",
-                        "&:hover": { backgroundColor: "transparent", boxShadow: "none", textDecoration: "underline" }
-                    }}
-                    >
-                    Documents
-                    </Button>
+            <Toolbar className="toolbar">
+                <Button 
+                component={Link}
+                to="/"
+                className="header-brand"
+            >
+                <h3 className="header-title">Document Management System</h3>
+            </Button>
+            <div className="header-nav">
+            <Button 
+                component={Link}
+                to="/create"
+                className="header-button"
+            >
+                Create Document
+            </Button>
 
-                    <Button 
-                    color="inherit"
-                    sx={{ 
-                        color: "white",
-                        "&:hover": { backgroundColor: "transparent", boxShadow: "none", textDecoration: "underline" }
-                    }}
-                    >
-                    Register
-                    </Button>
+            <Button 
+                component={Link}
+                to="/saved"
+                className="header-button"
+            >
+                Saved Documents
+            </Button>
 
-                    <Button 
-                    color="inherit"
-                    sx={{ 
-                        color: "white",
-                        "&:hover": { backgroundColor: "transparent", boxShadow: "none", textDecoration: "underline" }
-                    }}
-                    >
-                    Login
-                    </Button>
-            </Toolbar>
-        </AppBar>
-    );
+            <Button 
+                component={Link}
+                to="/films"
+                className="header-button"
+            >
+                Films
+            </Button>
+
+            <Button 
+                component={Link}
+                to="/register"
+                className="header-button"
+            >
+                Register
+            </Button>
+
+            <Button 
+                component={Link}
+                to="/login"
+                className="header-button"
+            >
+                Login
+            </Button>
+            </div>
+      </Toolbar>
+    </AppBar>
+  );
 }
