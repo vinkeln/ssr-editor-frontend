@@ -1,3 +1,5 @@
+/* Styling component for Footer.tsx */
+
 .footer {
     background-color: #f8f9fa;
     padding: 1rem 0;
@@ -15,4 +17,19 @@
 .footer .text-muted {
     color: #6c757d;
     font-size: 0.875rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+
+    a {
+      color: #1d1d1d;
+
+      &:hover {
+        color: #000000;
+        text-decoration: underline;
+      }
+    }
 }
