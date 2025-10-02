@@ -1,0 +1,57 @@
+/* Styling component for HomePage.tsx */
+
+.home-container {
+  padding: 10px;
+  font-family: serif;
+  border: 1px solid #000000;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Styling for the text section on the left.
+.text-section {
+  flex: 1;
+
+  h1 {
+    font-size: 42px;
+    font-weight: bold;
+    line-height: 1.3;
+    margin-bottom: 20px;
+  }
+
+  .create-btn {
+    background-color: #4b6cb7;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #2d4474;
+    }
+  }
+}
+
+// Styling for the image section and image to the right. 
+.image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+
+  img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
