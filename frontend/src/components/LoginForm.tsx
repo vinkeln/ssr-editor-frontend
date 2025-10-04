@@ -17,19 +17,40 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
         setError('');
         
         try {
-            const response = await axios.post(`${backendUrl}/login`, {
+            const response = await axios.post(`${backendUrl}/api/auth/login`, {
                 email,
                 password
             }, {
                 withCredentials: true // Ensure cookies are sent/received.
             });
 
-            // Store user data in localStorage.
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+            console.log('Login successful:', response.data);
+
+            // Store user data in localStorage
+            const userData = {
+                email: response.data.user.email,
+                name: response.data.user.name,
+                userId: response.data.userId
+            };
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            // Store token if available
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
+
+            window.dispatchEvent(new Event('userLogin'));
 
             navigate('/'); // Redirect to home or dashboard after login.
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Login failed');
+             console.error('Login error:', err);
+            
+            // Better error handling like in RegisterForm
+            if (err.code === 'NETWORK_ERROR' || err.code === 'ECONNREFUSED') {
+                setError('Cannot connect to server. Make sure backend is running.');
+            } else {
+                setError(err.response?.data?.error || 'Login failed');
+            }
         } finally {
             setLoading(false);
         }
