@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import type { RegisterFormProps } from "../types/register";
+import "../styles/Auth.scss";
 
 export default function RegisterForm({ backendUrl }: RegisterFormProps) {
     const [email, setEmail] = useState('');
@@ -18,38 +19,43 @@ export default function RegisterForm({ backendUrl }: RegisterFormProps) {
                 email,
                 password,
                 name
+            }, {
+                withCredentials: true // Ensure cookies are sent/received
             });
+
             // On successful registration, navigate to login page.
             navigate('/login'); // Adjust the path as necessary.
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.response?.data?.error || 'Registration failed');
         }
     };
 
     return (
         <form
             onSubmit={handleSubmit}
-            className="register-form"
+            className="auth-form"
         >
             <h2>Register</h2>
             {error && <p className="error-message">{error}</p>}
 
-            <label className="-name-label">Name</label>
+            <label className="name-label">Name</label>
             <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="-name-input"
+                className="name-input"
+                placeholder='Enter your name'
             />
 
-            <label className="email-label">Email</label>'
+            <label className="email-label">Email</label>
             <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="email-input"
+                placeholder='Enter your email'
             />
 
             <label className="password-label">Password</label>
@@ -59,6 +65,7 @@ export default function RegisterForm({ backendUrl }: RegisterFormProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="password-input"
+                placeholder='Enter a password'
             />
 
             <button

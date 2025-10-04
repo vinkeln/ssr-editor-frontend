@@ -21,7 +21,7 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
                 email,
                 password
             }, {
-                withCredentials: true // Ensure cookies are sent/received
+                withCredentials: true // Ensure cookies are sent/received.
             });
 
             // Store user data in localStorage.
@@ -29,7 +29,7 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
 
             navigate('/'); // Redirect to home or dashboard after login.
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Login failed');
+            setError(err.response?.data?.error || 'Login failed');
         } finally {
             setLoading(false);
         }
