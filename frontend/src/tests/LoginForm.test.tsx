@@ -72,7 +72,7 @@ describe('LoginForm', () => {
   });
 
   it('Disables submit button and shows loading text during submission', async () => {
-    // Mock axios to delay response
+    // Mock axios to delay response.
     vi.mocked(axios.post).mockImplementationOnce(
       () => new Promise(resolve => setTimeout(resolve, 100))
     );
@@ -103,5 +103,39 @@ describe('LoginForm', () => {
       expect(submitButton).not.toBeDisabled();
       expect(submitButton).toHaveTextContent('Login');
     });
+  });
+
+  it('Navigates to home page on successful login', async () => {
+    const mockUser = { id: 1, email: 'test@example.com' };
+    vi.mocked(axios.post).mockResolvedValueOnce({
+      data: { user: mockUser }
+    });
+
+    render(<MockLoginForm />);
+
+    const emailInput = screen.getByPlaceholderText(/enter your email/i);
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
+
+    fireEvent.change(emailInput, { 
+      target: { value: 'test@example.com' } 
+    });
+    fireEvent.change(passwordInput, { 
+      target: { value: 'password123' } 
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+    await waitFor(() => {
+      expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
+      expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
+  });
+
+  it('Has register link with correct href', () => {
+    render(<MockLoginForm />);
+
+    const registerLink = screen.getByRole('link', { name: /register here/i });
+    expect(registerLink).toBeInTheDocument();
+    expect(registerLink).toHaveAttribute('href', '/register');
   });
 });
