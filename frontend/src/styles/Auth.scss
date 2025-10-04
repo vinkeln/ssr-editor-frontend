@@ -1,6 +1,4 @@
-/* Registration page styling */
-
-// Auth.scss - Login Form Styles
+/* Registration and Login page styling */
 
 .auth-form {
   width: 100%;
@@ -42,7 +40,7 @@
     transition: all 0.2s;
     box-sizing: border-box;
     background-color: white;
-    color: #21489b;
+    color: #000000;
 
     &:focus {
       outline: none;
