@@ -89,7 +89,7 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
             </button>
 
             <p className="register-link">
-                Don't have an account? <a href="/register">Register here</a>
+                Don't have an account? <a href="/ssr-editor-frontend/register">Register here</a>
             </p>
         </form>
     );
