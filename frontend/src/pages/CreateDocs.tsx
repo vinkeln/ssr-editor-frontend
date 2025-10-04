@@ -17,13 +17,26 @@ function CreateDocs() {
     const [ isEditMode, setIsEditMode ] = useState<boolean>(false);
     const [editingDocId, setEditingDocId] = useState<number | null>(null);
 
-    const { saveDocument } = useDocumentStorage();
+    const { saveDocument, updateDocument } = useDocumentStorage();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const getCurrentUser = () => {
+        const userData = localStorage.getItem('user');
+        return userData ? JSON.parse(userData) : null;
+    };
 
     useEffect(() => {
         if (location.state?.editMode && location.state?.document) {
             const doc: Document = location.state.document;
+            const user = getCurrentUser();
+            
+            if (doc.userId !== user.userId) {
+                alert('You can only edit your own documents');
+                navigate('/saved');
+                return;
+            }
+
             setDocumentTitle(doc.title);
             setIsEditMode(true);
             setEditingDocId(doc.id);
@@ -32,37 +45,31 @@ function CreateDocs() {
             const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
             setEditorState(EditorState.createWithContent(contentState));
         }
-    }, [location.state]);
+    }, [location.state, navigate]);
 
-    const updateDocument = (docId: number, title: string, editorState: EditorState) => {
-        const contentState = editorState.getCurrentContent();
-        const htmlContent = draftToHtml(convertToRaw(contentState));
-
-        const docs = JSON.parse(localStorage.getItem("docs") || "[]");
-        const updatedDocs = docs.map((doc: Document) => {
-            if(doc.id === docId) {
-                return {
-                    ...doc,
-                    title: title.trim(),
-                    content: htmlContent,
-                };
-            }
-            return doc;
-        });
-            localStorage.setItem("docs", JSON.stringify(updatedDocs));
-        };
-
-    const handleSave = () => {
+    const handleSave = () => {        
         if (!documentTitle.trim()) {
             alert("Please enter a document title.");
             return;
         }
         
+        const contentState = editorState.getCurrentContent();
+        const htmlContent = draftToHtml(convertToRaw(contentState));
+        
         if(isEditMode && editingDocId !== null) {
-            updateDocument(editingDocId, documentTitle, editorState);
-            alert("Document updated successfully!");
+            const success = updateDocument(editingDocId, documentTitle, htmlContent);
+            if (success) {
+                alert("Document updated successfully!");
+            } else {
+                alert("Failed to update document");
+                return;
+            }
         } else {
-            saveDocument(documentTitle, editorState);
+            const result = saveDocument(documentTitle, editorState);
+            if (!result) {
+                alert("Failed to save document");
+                return;
+            }
             alert("Document saved successfully!");
         }
 
@@ -72,6 +79,7 @@ function CreateDocs() {
         setEditingDocId(null);
         navigate('/saved');
     };
+
 
 
     const handleCancel = (): void => {
