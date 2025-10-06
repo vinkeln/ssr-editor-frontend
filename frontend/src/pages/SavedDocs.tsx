@@ -3,19 +3,50 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Document } from "../types/document";
+import { useDocumentStorage } from "../hooks/documentStorage";
 import "../styles/SavedDocs.scss";
 
 function SavedDocs() {
   const [docs, setDocs] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { getDocuments, deleteDocument } = useDocumentStorage();
 
-  useEffect(() => {
-    const storedDocs = JSON.parse(localStorage.getItem("docs") || "[]");
-    setDocs(storedDocs);
+   useEffect(() => {
+    loadDocuments();
   }, []);
+
+  const loadDocuments = async () => {
+    try {
+      const userDocs = await getDocuments();
+      setDocs(userDocs);
+    } catch (error) {
+      console.error('Error loading documents:', error);
+      alert('Failed to load documents');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const editDocument = (document: Document) => {
     navigate('/create', { state: { editMode: true, document } });
+  }
+
+  const handleDelete = async (document: Document, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (window.confirm(`Are you sure you want to delete "${document.title}"?`)) {
+      const success = await deleteDocument(document.id);
+      if (success) {
+        await loadDocuments(); // Ladda om listan
+      } else {
+        alert('Failed to delete document');
+      }
+    }
+  };
+
+  if (loading) {
+    return <div className="saved-docs-container">Loading documents...</div>;
   }
 
    return (
@@ -33,7 +64,16 @@ function SavedDocs() {
                 onClick={() => editDocument(document)}
               >
                 <div className="saved-docs-card-body">
-                  <h5 className="saved-docs-card-title">{document.title}</h5>
+                  <div className="saved-docs-card-header">
+                    <h5 className="saved-docs-card-title">{document.title}</h5>
+                    <button
+                      className="delete-button"
+                      onClick={(e) => handleDelete(document, e)}
+                    >
+                      X
+                    </button>
+                  </div>
+                  
                   <p className="saved-docs-card-date">
                     {new Date(document.createdAt).toLocaleDateString()}
                   </p>

@@ -15,15 +15,30 @@ function CreateDocs() {
         EditorState.createEmpty()
     );
     const [ isEditMode, setIsEditMode ] = useState<boolean>(false);
-    const [editingDocId, setEditingDocId] = useState<number | null>(null);
+    const [editingDocId, setEditingDocId] = useState<string | null>(null);
 
-    const { saveDocument } = useDocumentStorage();
+    const [isSaving, setIsSaving] = useState<boolean>(false)
+
+    const { saveDocument, updateDocument } = useDocumentStorage();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const getCurrentUser = () => {
+        const userData = localStorage.getItem('user');
+        return userData ? JSON.parse(userData) : null;
+    };
 
     useEffect(() => {
         if (location.state?.editMode && location.state?.document) {
             const doc: Document = location.state.document;
+            const user = getCurrentUser();
+            
+            if (doc.userId !== user.userId) {
+                alert('You can only edit your own documents');
+                navigate('/saved');
+                return;
+            }
+
             setDocumentTitle(doc.title);
             setIsEditMode(true);
             setEditingDocId(doc.id);
@@ -32,47 +47,49 @@ function CreateDocs() {
             const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
             setEditorState(EditorState.createWithContent(contentState));
         }
-    }, [location.state]);
+    }, [location.state, navigate]);
 
-    const updateDocument = (docId: number, title: string, editorState: EditorState) => {
-        const contentState = editorState.getCurrentContent();
-        const htmlContent = draftToHtml(convertToRaw(contentState));
-
-        const docs = JSON.parse(localStorage.getItem("docs") || "[]");
-        const updatedDocs = docs.map((doc: Document) => {
-            if(doc.id === docId) {
-                return {
-                    ...doc,
-                    title: title.trim(),
-                    content: htmlContent,
-                };
-            }
-            return doc;
-        });
-            localStorage.setItem("docs", JSON.stringify(updatedDocs));
-        };
-
-    const handleSave = () => {
+    const handleSave = async () => {        
         if (!documentTitle.trim()) {
             alert("Please enter a document title.");
             return;
         }
         
-        if(isEditMode && editingDocId !== null) {
-            updateDocument(editingDocId, documentTitle, editorState);
-            alert("Document updated successfully!");
-        } else {
-            saveDocument(documentTitle, editorState);
-            alert("Document saved successfully!");
+        const contentState = editorState.getCurrentContent();
+        const htmlContent = draftToHtml(convertToRaw(contentState));
+
+        setIsSaving(true);
+
+    try {
+            if (isEditMode && editingDocId !== null) {
+                const success = await updateDocument(editingDocId, documentTitle, htmlContent);
+                if (success) {
+                    alert("Document updated successfully!");
+                } else {
+                    alert("Failed to update document");
+                    return;
+                }
+            } else {
+                const result = await saveDocument(documentTitle, editorState);
+                if (!result) {
+                    alert("Failed to save document");
+                    return;
+                }
+                alert("Document saved successfully!");
+            }
+
+            setDocumentTitle("Untitled Document");
+            setEditorState(EditorState.createEmpty());
+            setIsEditMode(false);
+            setEditingDocId(null);
+            navigate('/saved');
+        } catch (error) {
+            console.error('Error saving document:', error);
+            alert("An error occurred while saving the document");
+        } finally {
+            setIsSaving(false);
         }
-
-        setDocumentTitle("Untitled Document");
-        setEditorState(EditorState.createEmpty());
-        setIsEditMode(false);
-        setEditingDocId(null);
-        navigate('/saved');
     };
-
 
     const handleCancel = (): void => {
     const message = isEditMode 
@@ -104,7 +121,8 @@ function CreateDocs() {
                 <ActionButtons 
                     onSave={handleSave}
                     onCancel={handleCancel}
-                    isSaveDisabled={!documentTitle.trim()}
+                    isSaveDisabled={!documentTitle.trim() || isSaving}
+                    isSaving={isSaving}
                 />
 
                 <RichTextEditor

@@ -1,71 +1,135 @@
-// Filename - Header.js
+// Filename - Header.tsx
 
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 // importing material UI components
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-// import Box from "@material-ui/core/Box/Box";
+import type { User } from "../types/user";
+import "../styles/Header.scss";
+
 
 export default function Header() {
+    const [user, setUser] = useState<User | null>(null);
+    const navigate = useNavigate();
+
+        useEffect(() => {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            try {
+                setUser(JSON.parse(userData));
+            } catch (error) {
+                console.error('Error with user data:', error);
+                localStorage.removeItem('user');
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const userData = localStorage.getItem('user');
+            setUser(userData ? JSON.parse(userData) : null);
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+        useEffect(() => {
+            const handleUserLogin = () => {
+            const userData = localStorage.getItem('user');
+            setUser(userData ? JSON.parse(userData) : null);
+        };
+
+        window.addEventListener('userLogin', handleUserLogin);
+        return () => window.removeEventListener('userLogin', handleUserLogin);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        
+        // Uppdatera state
+        setUser(null);
+        
+        // Redirect till login
+        navigate('/login');
+    };
+
     return (
-        <AppBar position="static">
-            <Toolbar>
-                {/*Inside the IconButton, we 
-                    can render various icons*/}
-                <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="menu"
-                    sx={{ mr: 2 }}
-                >
-                    {/*This is a simple Menu 
-                      Icon wrapped in Icon */}
-                    <MenuIcon />
-                </IconButton>
-                {/* The Typography component applies 
-                     default font weights and sizes */}
+        <AppBar position="static" className="header">
 
-                <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{ flexGrow: 1, color: "yellow" }}
-                >
-                    Group L & J Header
-                </Typography>
-                    <Button 
-                    color="inherit"
-                    sx={{ 
-                        color: "white",
-                        "&:hover": { backgroundColor: "transparent", boxShadow: "none", textDecoration: "underline" }
-                    }}
-                    >
-                    Documents
-                    </Button>
+            <Toolbar className="toolbar">
+                <Button 
+                component={Link}
+                to="/"
+                className="header-brand"
+            >
+                <h3 className="header-title">Document Management System</h3>
+            </Button>
 
-                    <Button 
-                    color="inherit"
-                    sx={{ 
-                        color: "white",
-                        "&:hover": { backgroundColor: "transparent", boxShadow: "none", textDecoration: "underline" }
-                    }}
-                    >
-                    Register
-                    </Button>
+            <div className="header-nav">
+            <Button 
+                component={Link}
+                to="/create"
+                className="header-button"
+            >
+                Create Document
+            </Button>
 
-                    <Button 
-                    color="inherit"
-                    sx={{ 
-                        color: "white",
-                        "&:hover": { backgroundColor: "transparent", boxShadow: "none", textDecoration: "underline" }
-                    }}
-                    >
-                    Login
-                    </Button>
-            </Toolbar>
-        </AppBar>
-    );
+            <Button 
+                component={Link}
+                to="/saved"
+                className="header-button"
+            >
+                Saved Documents
+            </Button>
+
+            <Button 
+                component={Link}
+                to="/films"
+                className="header-button"
+            >
+                Films
+            </Button>
+
+            {user ? (
+                    <>
+                        <a
+                            className="header-button"
+                        >   
+                            User: {user.name || user.email}
+                        </a>
+
+                        <Button 
+                            onClick={handleLogout}
+                            className="header-button"
+                        >
+                            Logout
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button 
+                            component={Link}
+                            to="/register"
+                            className="header-button"
+                        >
+                            Register
+                        </Button>
+
+                        <Button 
+                            component={Link}
+                            to="/login"
+                            className="header-button"
+                        >
+                            Login
+                        </Button>
+                    </>
+                    )}
+            </div>
+      </Toolbar>
+    </AppBar>
+  );
 }

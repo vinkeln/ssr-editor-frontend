@@ -1,32 +1,29 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import { Header, Footer } from "./includes";
+import { HomePage, CreateDocs, SavedDocs, FilmsList, Register, Login } from "./imports";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/App.css";
-import Header from "./includes/Header";
-import Footer from "./includes/Footer";
-import HomePage from "./pages/HomePage";
-import CreateDocs from "./pages/CreateDocs";
-import SavedDocs from "./pages/SavedDocs";
-import FilmsList from "./pages/FilmsList";
-import ListPage from "./pages/ListPage";
 
 function App() {
   return (
     <div className="app-container">
       <Header />
-      <nav style={{ marginBottom: "1rem" }}>
-        <Link to="/">Home</Link> |{" "}
-        <Link to="/create">Create Document</Link> |{" "}
-        <Link to="/saved">Saved Documents</Link> |{" "}
-        <Link to="/list">List Documents</Link> |{" "}
-        <Link to="/films">Films</Link>
-      </nav>
-
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/create" element={<CreateDocs />} />
-          <Route path="/saved" element={<SavedDocs />} />
+          <Route path="/create" element={<ProtectedRoute showAlert={true}>
+            <CreateDocs />
+          </ProtectedRoute>
+         } 
+        />
+          <Route path="/saved" element={ <ProtectedRoute showAlert={true}>
+            <SavedDocs />
+          </ProtectedRoute>
+          } 
+        />
           <Route path="/films" element={<FilmsList />} />
-          <Route path="/list" element={<ListPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </main>
       <Footer />
