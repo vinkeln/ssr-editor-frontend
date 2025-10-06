@@ -106,9 +106,9 @@ describe('LoginForm', () => {
   });
 
   it('Navigates to home page on successful login', async () => {
-    const mockUser = { id: 1, email: 'test@example.com' };
+    const mockUser = { email: 'test@example.com', userId: 1 }; // <-- ändra ordningen här
     vi.mocked(axios.post).mockResolvedValueOnce({
-      data: { user: mockUser }
+    data: { user: mockUser, userId: 1 }
     });
 
     render(<MockLoginForm />);
@@ -136,6 +136,6 @@ describe('LoginForm', () => {
 
     const registerLink = screen.getByRole('link', { name: /register here/i });
     expect(registerLink).toBeInTheDocument();
-    expect(registerLink).toHaveAttribute('href', '/register');
+    expect(registerLink).toHaveAttribute('href', '/ssr-editor-frontend/register');
   });
 });

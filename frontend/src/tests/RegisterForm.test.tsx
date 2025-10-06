@@ -77,7 +77,7 @@ describe('RegisterForm', () => {
     await waitFor(() => {
       // Check that axios.post was called with the correct URL and data.
       expect(mockedPost).toHaveBeenCalledWith(
-        'http://backend.com/register',
+        'http://backend.com/api/auth/register',
         {
           name: 'Lich23',
           email: 'lich23@example.com',
