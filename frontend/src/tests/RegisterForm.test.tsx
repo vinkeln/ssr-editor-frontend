@@ -20,7 +20,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const MockRegisterForm = ({ backendUrl = 'http://localhost:1337' } = {}) => (
+const MockRegisterForm = ({ backendUrl = 'http://localhost:3001' } = {}) => (
     <BrowserRouter>
         <RegisterForm backendUrl={backendUrl} />
     </BrowserRouter>

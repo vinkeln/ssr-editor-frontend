@@ -20,7 +20,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const MockLoginForm = ({ backendUrl = 'http://localhost:1337' }) => (
+const MockLoginForm = ({ backendUrl = 'http://localhost:3001' }) => (
   <BrowserRouter>
     <LoginForm backendUrl={backendUrl} />
   </BrowserRouter>
@@ -106,31 +106,33 @@ describe('LoginForm', () => {
   });
 
   it('Navigates to home page on successful login', async () => {
-    const mockUser = { email: 'test@example.com', userId: 1 }; // <-- ändra ordningen här
-    vi.mocked(axios.post).mockResolvedValueOnce({
-    data: { user: mockUser, userId: 1 }
-    });
-
-    render(<MockLoginForm />);
-
-    const emailInput = screen.getByPlaceholderText(/enter your email/i);
-    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
-
-    fireEvent.change(emailInput, { 
-      target: { value: 'test@example.com' } 
-    });
-    fireEvent.change(passwordInput, { 
-      target: { value: 'password123' } 
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /login/i }));
-
-    await waitFor(() => {
-      expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
-      expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
+  const mockUser = { email: 'test@example.com', userId: 1 };
+  vi.mocked(axios.post).mockResolvedValueOnce({
+    data: { user: mockUser, userId: 1, token: "abc" }
   });
 
+  render(<MockLoginForm />);
+
+  const emailInput = screen.getByPlaceholderText(/enter your email/i);
+  const passwordInput = screen.getByPlaceholderText(/enter your password/i);
+
+  fireEvent.change(emailInput, { 
+    target: { value: 'test@example.com' } 
+  });
+  fireEvent.change(passwordInput, { 
+    target: { value: 'password123' } 
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+    await waitFor(() => {
+    const userData = localStorage.getItem('user');
+    const user = userData ? JSON.parse(userData) : null;
+    expect(user?.email).toBe('test@example.com');
+    expect(user?.userId).toBe(1);
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
+});
   it('Has register link with correct href', () => {
     render(<MockLoginForm />);
 
