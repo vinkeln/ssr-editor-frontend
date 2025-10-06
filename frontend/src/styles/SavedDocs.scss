@@ -20,17 +20,23 @@
     gap: 1rem;
 
     @media (min-width: 1200px) {
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(5, minmax(200px, 1fr));
     }
 
     // Tablet
-    @media (max-width: 992px) {
-      grid-template-columns: repeat(3, 1fr);
+    @media (max-width: 1199px) and (min-width: 768px) {
+      grid-template-columns: repeat(3, minmax(200px, 1fr));
+    }
+
+    @media (max-width: 767px) and (min-width: 576px) {
+      grid-template-columns: repeat(2, minmax(200px, 1fr));
     }
 
     // Mobil
-    @media (max-width: 576px) {
-      grid-template-columns: repeat(1, 1fr);
+    @media (max-width: 575px) {
+      grid-template-columns: 1fr;
+      max-width: 400px;
+      margin: 0 auto;
     }
   }
 
