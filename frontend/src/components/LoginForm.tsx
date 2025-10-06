@@ -27,12 +27,20 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
             console.log('Login successful:', response.data);
 
             // Store user data in localStorage
+            const { token, userId } = response.data;
+
+            if (!userId || !token) {
+            throw new Error("Invalid login response: missing userId or token.");
+            }
+
             const userData = {
-                email: response.data.user.email,
-                name: response.data.user.name,
-                userId: response.data.userId
+            userId,
+            email: email, // från inmatningen
+            name: "",     // om du inte har namn i svaret
             };
+
             localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem('token', token);
 
             // Store token if available
             if (response.data.token) {

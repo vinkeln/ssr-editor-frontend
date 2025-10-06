@@ -1,5 +1,5 @@
 import LoginForm from "../components/LoginForm";
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"; 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:1337"; 
 
 export default function LoginPage() {
     return (

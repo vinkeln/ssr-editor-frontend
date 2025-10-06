@@ -3,15 +3,20 @@ import { EditorState } from 'draft-js';
 import { convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 
-interface Document {
-    id: string;
-    title: string;
-    content: string;
-    createdAt: string;
+export interface Document {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt?: string;
+  ownerId?: string;
+  sharedWith?: {
     userId: string;
+    accessLevel: 'read' | 'edit';
+  }[];
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api/documents';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:1337/api/documents';
 
 export const useDocumentStorage = () => {
   const getAuthHeaders = () => {
@@ -38,7 +43,7 @@ export const useDocumentStorage = () => {
       const contentState = editorState.getCurrentContent();
       const htmlContent = draftToHtml(convertToRaw(contentState));
 
-      const response = await fetch(`${API_BASE}/create-document`, {
+      const response = await fetch(`${API_BASE}/`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -59,9 +64,9 @@ export const useDocumentStorage = () => {
     }
   };
 
-  const getDocuments = async (): Promise<Document[]> => {
+  const getDocuments = async (): Promise<{ owned: Document[]; shared: Document[]; total: number }> => {
     try {
-      const response = await fetch(`${API_BASE}/my-documents`, {
+      const response = await fetch(`${API_BASE}/`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -73,13 +78,13 @@ export const useDocumentStorage = () => {
       return await response.json();
     } catch (error) {
       console.error('Error fetching documents:', error);
-      return [];
+      return { owned: [], shared: [], total: 0 };
     }
   };
 
   const deleteDocument = async (id: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE}/delete-document/${id}`, {
+      const response = await fetch(`${API_BASE}/${id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -97,7 +102,7 @@ export const useDocumentStorage = () => {
 
   const updateDocument = async (id: string, title: string, content: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE}/update-document/${id}`, {
+      const response = await fetch(`${API_BASE}/${id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({

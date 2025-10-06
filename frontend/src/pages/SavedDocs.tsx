@@ -18,8 +18,15 @@ function SavedDocs() {
 
   const loadDocuments = async () => {
     try {
-      const userDocs = await getDocuments();
-      setDocs(userDocs);
+      const response = await getDocuments();
+      // Ensure each document has a userId property
+      const allDocs = [...response.owned, ...response.shared].map((doc: any) => ({
+      ...doc,
+      id: doc.id ?? doc._id?.toString() ?? "", // 💡 detta ger ett korrekt "id"
+      userId: doc.userId ?? doc.ownerId ?? "",
+    }));
+
+      setDocs(allDocs);
     } catch (error) {
       console.error('Error loading documents:', error);
       alert('Failed to load documents');
