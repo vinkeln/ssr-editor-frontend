@@ -12,11 +12,21 @@ function SavedDocs() {
   const navigate = useNavigate();
   const { getDocuments, deleteDocument } = useDocumentStorage();
 
-  useEffect(() => {
-    const userDocs = getDocuments();
-    setDocs(userDocs);
-    setLoading(false);
+   useEffect(() => {
+    loadDocuments();
   }, []);
+
+  const loadDocuments = async () => {
+    try {
+      const userDocs = await getDocuments();
+      setDocs(userDocs);
+    } catch (error) {
+      console.error('Error loading documents:', error);
+      alert('Failed to load documents');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const editDocument = (document: Document) => {
     navigate('/create', { state: { editMode: true, document } });
@@ -26,15 +36,14 @@ function SavedDocs() {
     e.stopPropagation();
     
     if (window.confirm(`Are you sure you want to delete "${document.title}"?`)) {
-      const success = deleteDocument(document.id);
+      const success = await deleteDocument(document.id);
       if (success) {
-        const updatedDocs = getDocuments();
-        setDocs(updatedDocs);
+        await loadDocuments(); // Ladda om listan
       } else {
         alert('Failed to delete document');
       }
     }
-  }
+  };
 
   if (loading) {
     return <div className="saved-docs-container">Loading documents...</div>;

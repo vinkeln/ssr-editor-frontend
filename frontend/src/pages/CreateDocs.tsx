@@ -15,7 +15,9 @@ function CreateDocs() {
         EditorState.createEmpty()
     );
     const [ isEditMode, setIsEditMode ] = useState<boolean>(false);
-    const [editingDocId, setEditingDocId] = useState<number | null>(null);
+    const [editingDocId, setEditingDocId] = useState<string | null>(null);
+
+    const [isSaving, setIsSaving] = useState<boolean>(false)
 
     const { saveDocument, updateDocument } = useDocumentStorage();
     const location = useLocation();
@@ -47,7 +49,7 @@ function CreateDocs() {
         }
     }, [location.state, navigate]);
 
-    const handleSave = () => {        
+    const handleSave = async () => {        
         if (!documentTitle.trim()) {
             alert("Please enter a document title.");
             return;
@@ -55,32 +57,39 @@ function CreateDocs() {
         
         const contentState = editorState.getCurrentContent();
         const htmlContent = draftToHtml(convertToRaw(contentState));
-        
-        if(isEditMode && editingDocId !== null) {
-            const success = updateDocument(editingDocId, documentTitle, htmlContent);
-            if (success) {
-                alert("Document updated successfully!");
+
+        setIsSaving(true);
+
+    try {
+            if (isEditMode && editingDocId !== null) {
+                const success = await updateDocument(editingDocId, documentTitle, htmlContent);
+                if (success) {
+                    alert("Document updated successfully!");
+                } else {
+                    alert("Failed to update document");
+                    return;
+                }
             } else {
-                alert("Failed to update document");
-                return;
+                const result = await saveDocument(documentTitle, editorState);
+                if (!result) {
+                    alert("Failed to save document");
+                    return;
+                }
+                alert("Document saved successfully!");
             }
-        } else {
-            const result = saveDocument(documentTitle, editorState);
-            if (!result) {
-                alert("Failed to save document");
-                return;
-            }
-            alert("Document saved successfully!");
+
+            setDocumentTitle("Untitled Document");
+            setEditorState(EditorState.createEmpty());
+            setIsEditMode(false);
+            setEditingDocId(null);
+            navigate('/saved');
+        } catch (error) {
+            console.error('Error saving document:', error);
+            alert("An error occurred while saving the document");
+        } finally {
+            setIsSaving(false);
         }
-
-        setDocumentTitle("Untitled Document");
-        setEditorState(EditorState.createEmpty());
-        setIsEditMode(false);
-        setEditingDocId(null);
-        navigate('/saved');
     };
-
-
 
     const handleCancel = (): void => {
     const message = isEditMode 
@@ -112,7 +121,8 @@ function CreateDocs() {
                 <ActionButtons 
                     onSave={handleSave}
                     onCancel={handleCancel}
-                    isSaveDisabled={!documentTitle.trim()}
+                    isSaveDisabled={!documentTitle.trim() || isSaving}
+                    isSaving={isSaving}
                 />
 
                 <RichTextEditor
