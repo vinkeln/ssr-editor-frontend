@@ -2,114 +2,144 @@
 import { EditorState } from 'draft-js';
 import { convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
-import { useRef } from 'react';
 
 interface Document {
-  id: number;
-  title: string;
-  content: string;
-  createdAt: string;
-  userId: string;
+    id: string;
+    title: string;
+    content: string;
+    createdAt: string;
+    userId: string;
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api/documents';
+
 export const useDocumentStorage = () => {
-  const storage = useRef({
-    getCurrentUser: () => {
-      const userData = localStorage.getItem('user');
-      return userData ? JSON.parse(userData) : null;
-    },
-
-    saveDocument: (title: string, editorState: EditorState): Document | null => {
-      const user = storage.current.getCurrentUser();
-      if (!user) {
-        console.error('No user logged in');
-        return null;
-    }
-
-    const contentState = editorState.getCurrentContent();
-    const htmlContent = draftToHtml(convertToRaw(contentState));
-
-    // Create a new document object.
-    const newDoc: Document = {
-      id: Date.now(),
-      title: title.trim(),
-      content: htmlContent,
-      createdAt: new Date().toISOString(),
-      userId: user.userId,
+  const getAuthHeaders = () => {
+    const userData = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
     };
+    
+    if (userData) {
+      headers['user'] = userData;
+    }
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+  };
 
-    // Get existing documents from localStorage and add the new document.
-    const existingDocs: Document[] = JSON.parse(localStorage.getItem("docs") || "[]");
-    localStorage.setItem("docs", JSON.stringify([...existingDocs, newDoc]));
+  const saveDocument = async (title: string, editorState: EditorState): Promise<Document | null> => {
+    try {
+      const contentState = editorState.getCurrentContent();
+      const htmlContent = draftToHtml(convertToRaw(contentState));
 
-    return newDoc;
-  },
+      const response = await fetch(`${API_BASE}/create-document`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: title.trim(),
+          content: htmlContent
+        })
+      });
 
-  getDocuments: (): Document[] => {
-    const user = storage.current.getCurrentUser();
-    if (!user) return [];
+      if (!response.ok) {
+        throw new Error('Failed to save document');
+      }
 
-    const allDocs: Document[] = JSON.parse(localStorage.getItem("docs") || "[]");
-    return allDocs.filter(doc => doc.userId === user.userId);
-  },
+      const result = await response.json();
+      return result.document;
+    } catch (error) {
+      console.error('Error saving document:', error);
+      return null;
+    }
+  };
 
-  deleteDocument: (id: number): boolean => {
-    const user = storage.current.getCurrentUser();
-    if (!user) return false;
+  const getDocuments = async (): Promise<Document[]> => {
+    try {
+      const response = await fetch(`${API_BASE}/my-documents`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
 
-    const existingDocs: Document[] = JSON.parse(localStorage.getItem("docs") || "[]");
+      if (!response.ok) {
+        throw new Error('Failed to fetch documents');
+      }
 
-    const docToDelete = existingDocs.find(doc => doc.id === id);
-    if (docToDelete && docToDelete.userId !== user.userId) {
-      console.error('User not authorized to delete this document');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+      return [];
+    }
+  };
+
+  const deleteDocument = async (id: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE}/delete-document/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting document:', error);
       return false;
     }
+  };
 
-    const filteredDocs = existingDocs.filter(doc => doc.id !== id);
-    localStorage.setItem("docs", JSON.stringify(filteredDocs));
-    return true;
-  },
-
-  updateDocument: (id: number, title: string, content: string): boolean => {
-    const user = storage.current.getCurrentUser();
-    if (!user) return false;
-
-    const existingDocs: Document[] = JSON.parse(localStorage.getItem("docs") || "[]");
-    
-    const updatedDocs = existingDocs.map(doc => {
-      if (doc.id === id) {
-        if (doc.userId !== user.userId) {
-          console.error('User does not own this document');
-          return doc;
-        }
-        
-        return {
-          ...doc,
+  const updateDocument = async (id: string, title: string, content: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE}/update-document/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
           title: title.trim(),
-          content: content,
-        };
+          content: content
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update document');
       }
-      return doc;
-    });
 
-    localStorage.setItem("docs", JSON.stringify(updatedDocs));
-    return true;
-  },
-
-  getDocumentById: (id: number): Document | null => {
-    const user = storage.current.getCurrentUser();
-    if (!user) return null;
-
-    const allDocs: Document[] = JSON.parse(localStorage.getItem("docs") || "[]");
-    const doc = allDocs.find(doc => doc.id === id);
-    
-    if (doc && doc.userId === user.userId) {
-      return doc;
+      return true;
+    } catch (error) {
+      console.error('Error updating document:', error);
+      return false;
     }
-    
-    return null;
-    }
-  });
+  };
 
-  return storage.current;
+  const getDocumentById = async (id: string): Promise<Document | null> => {
+    try {
+      const response = await fetch(`${API_BASE}/${id}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch document');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching document:', error);
+      return null;
+    }
+  };
+
+  return {
+    saveDocument,
+    getDocuments,
+    deleteDocument,
+    updateDocument,
+    getDocumentById
+  };
 };
