@@ -23,21 +23,9 @@ function CreateDocs() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const getCurrentUser = () => {
-        const userData = localStorage.getItem('user');
-        return userData ? JSON.parse(userData) : null;
-    };
-
     useEffect(() => {
         if (location.state?.editMode && location.state?.document) {
             const doc: Document = location.state.document;
-            const user = getCurrentUser();
-            
-            if (doc.userId !== user.userId) {
-                alert('You can only edit your own documents');
-                navigate('/saved');
-                return;
-            }
 
             setDocumentTitle(doc.title);
             setIsEditMode(true);
@@ -66,7 +54,7 @@ function CreateDocs() {
                 if (success) {
                     alert("Document updated successfully!");
                 } else {
-                    alert("Failed to update document");
+                    alert("Failed to update document - you may not have permission");
                     return;
                 }
             } else {

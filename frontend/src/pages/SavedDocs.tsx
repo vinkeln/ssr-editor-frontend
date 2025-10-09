@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Document } from "../types/document";
 import { useDocumentStorage } from "../hooks/documentStorage";
+import ShareForm from "../components/ShareForm";
 import "../styles/SavedDocs.scss";
 
 function SavedDocs() {
@@ -11,6 +12,11 @@ function SavedDocs() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { getDocuments, deleteDocument } = useDocumentStorage();
+
+  const shareForm = ShareForm({ 
+    documents: docs, 
+    onDocumentsUpdate: setDocs 
+  });
 
    useEffect(() => {
     loadDocuments();
@@ -22,7 +28,7 @@ function SavedDocs() {
       // Ensure each document has a userId property
       const allDocs = [...response.owned, ...response.shared].map((doc: any) => ({
       ...doc,
-      id: doc.id ?? doc._id?.toString() ?? "", // 💡 detta ger ett korrekt "id"
+      id: doc.id ?? doc._id?.toString() ?? "",
       userId: doc.userId ?? doc.ownerId ?? "",
     }));
 
@@ -45,11 +51,15 @@ function SavedDocs() {
     if (window.confirm(`Are you sure you want to delete "${document.title}"?`)) {
       const success = await deleteDocument(document.id);
       if (success) {
-        await loadDocuments(); // Ladda om listan
+        await loadDocuments();
       } else {
         alert('Failed to delete document');
       }
     }
+  };
+
+   const handleShareClick = (document: Document, e: React.MouseEvent) => {
+    shareForm.openShareModal(document, e);
   };
 
   if (loading) {
@@ -73,14 +83,29 @@ function SavedDocs() {
                 <div className="saved-docs-card-body">
                   <div className="saved-docs-card-header">
                     <h5 className="saved-docs-card-title">{document.title}</h5>
-                    <button
-                      className="delete-button"
-                      onClick={(e) => handleDelete(document, e)}
-                    >
-                      X
-                    </button>
+                    <div className="card-actions">
+                      <button
+                        className="share-button"
+                        onClick={(e) => handleShareClick(document, e)}
+                        title="Share document"
+                      >
+                        🔗
+                      </button>
+                      <button
+                        className="delete-button"
+                        onClick={(e) => handleDelete(document, e)}
+                      >
+                        X
+                      </button>
+                    </div>
                   </div>
-                  
+
+                  {document.sharedWith && document.sharedWith.length > 0 && (
+                  <div className="shared-badge">
+                    <span className="shared-icon">👥</span>
+                  </div>
+                  )}
+
                   <p className="saved-docs-card-date">
                     {new Date(document.createdAt).toLocaleDateString()}
                   </p>
@@ -97,6 +122,7 @@ function SavedDocs() {
           ))}
         </div>
       )}
+      {shareForm.ShareModal}
     </div>
   );
 }
