@@ -118,22 +118,44 @@
       background-color: #b8b8b8;
     }
   }
+
+.card-actions {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
 .delete-button {
   background: #dc3545;
-  border: none;
-  width: 24px;
-  height: 22px;
+  border-radius: 4px;
+  width: 26px;
+  height: 24px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+.share-button {
+  background: #4b6cb7;
+  border-radius: 4px;
+  width: 26px;
+  height: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   
   &:hover {
-    background: #c82333;
-    transform: scale(1.1);
+    transform: scale(1.2);
   }
 }
+
