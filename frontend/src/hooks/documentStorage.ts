@@ -1,7 +1,11 @@
-/* Custom hook for managing document storage in localStorage */
-import { EditorState } from 'draft-js';
-import { convertToRaw } from 'draft-js';
+/* Custom hook for managing documents via GraphQL */
+import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
+import { useMutation, useLazyQuery, } from "@apollo/client/react";
+import { 
+  CREATE_DOCUMENT, UPDATE_DOCUMENT, DELETE_DOCUMENT, GET_MY_DOCUMENTS, 
+  GET_DOCUMENT_BY_ID, GET_SHARED_DOCUMENTS
+} from "../graphQL/queries";
 
 export interface Document {
   id: string;
@@ -12,139 +16,156 @@ export interface Document {
   ownerId?: string;
   sharedWith?: {
     userId: string;
+    email?: string;
     accessLevel: 'read' | 'edit';
+    sharedAt?: string;
   }[];
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:1337/api/documents';
-
 export const useDocumentStorage = () => {
-  const getAuthHeaders = () => {
-    const userData = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-    
-    if (userData) {
-      headers['user'] = userData;
-    }
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    
-    return headers;
-  };
+  const [createDocumentMutation] = useMutation<{ createDocument: Document }>(CREATE_DOCUMENT);
+  const [updateDocumentMutation] = useMutation<{ updateDocument: Document }>(UPDATE_DOCUMENT);
+  const [deleteDocumentMutation] = useMutation<{ deleteDocument: Document }>(DELETE_DOCUMENT);
+  //const [shareDocumentMutation] = useMutation<{ shareDocument: Document }>(SHARE_DOCUMENT);
+  const [getDocumentsQuery, { data: documentsData, loading: documentsLoading, error: documentsError }] = useLazyQuery<{ myDocuments: Document[] }>(GET_MY_DOCUMENTS);
+  const [getSharedDocumentsQuery] = useLazyQuery<{ sharedDocuments: Document[] }>(GET_SHARED_DOCUMENTS);
+  
+  const [getDocumentByIdQuery] = useLazyQuery<{ document: Document }>(GET_DOCUMENT_BY_ID);
+  
 
   const saveDocument = async (title: string, editorState: EditorState): Promise<Document | null> => {
     try {
-      const contentState = editorState.getCurrentContent();
-      const htmlContent = draftToHtml(convertToRaw(contentState));
-
-      const response = await fetch(`${API_BASE}/`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          title: title.trim(),
-          content: htmlContent
-        })
+      const htmlContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+      console.log('Saving document variables:', { title: title.trim(), content: htmlContent });
+      const { data } = await createDocumentMutation({
+        variables: { title: title.trim(), content: htmlContent },
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save document');
-      }
-
-      const result = await response.json();
-      return result.document;
+      return data?.createDocument || null;
     } catch (error) {
-      console.error('Error saving document:', error);
+      console.error(" Error saving document (GraphQL):", error);
+      if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
       return null;
     }
   };
 
   const getDocuments = async (): Promise<{ owned: Document[]; shared: Document[]; total: number }> => {
     try {
-      const response = await fetch(`${API_BASE}/`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch documents');
-      }
-
-      return await response.json();
+      console.log('🔍 getDocuments - Starting...');
+      
+      // ⚠️ KORREKT SYNTAX: Anropa båda queries separat
+      console.log('🔍 Calling myDocuments query...');
+      const ownedResult = await getDocumentsQuery();
+      
+      console.log('🔍 Calling sharedDocuments query...');
+      const sharedResult = await getSharedDocumentsQuery();
+      
+      console.log('🔍 myDocuments result:', ownedResult);
+      console.log('🔍 sharedDocuments result:', sharedResult);
+      
+      const owned = ownedResult.data?.myDocuments || [];
+      const shared = sharedResult.data?.sharedDocuments || [];
+      
+      console.log('🔍 Final counts - Owned:', owned.length, 'Shared:', shared.length);
+      
+      return { owned, shared, total: owned.length + shared.length };
     } catch (error) {
-      console.error('Error fetching documents:', error);
+      console.error("Error fetching documents (GraphQL):", error);
       return { owned: [], shared: [], total: 0 };
+    }
+  };
+
+  const updateDocument = async (id: string, title: string, content: string): Promise<Document | null> => {
+    try {
+      const { data } = await updateDocumentMutation({
+        variables: { id, title, content },
+      });
+      return data?.updateDocument || null;
+    } catch (error) {
+      console.error("Error updating document (GraphQL):", error);
+      return null;
     }
   };
 
   const deleteDocument = async (id: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE}/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete document');
-      }
-
-      return true;
+      const { data } = await deleteDocumentMutation({ variables: { id } });
+      return !!data?.deleteDocument?.id;
     } catch (error) {
-      console.error('Error deleting document:', error);
-      return false;
-    }
-  };
-
-  const updateDocument = async (id: string, title: string, content: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`${API_BASE}/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          title: title.trim(),
-          content: content
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update document');
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error updating document:', error);
+      console.error("Error deleting document (GraphQL):", error);
       return false;
     }
   };
 
   const getDocumentById = async (id: string): Promise<Document | null> => {
     try {
-      const response = await fetch(`${API_BASE}/${id}`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch document');
-      }
-
-      return await response.json();
+      const { data } = await getDocumentByIdQuery({ variables: { id } });
+      return data?.document || null;
     } catch (error) {
-      console.error('Error fetching document:', error);
       return null;
     }
   };
 
+ const shareDocument = async (documentId: string, email: string, accessLevel: "read" | "edit") => {
+  try {
+    console.log('sharing with Mailgun:', { 
+      documentId, 
+      email: email.toLowerCase().trim(), 
+      accessLevel 
+    });
+
+    const token = localStorage.getItem('token');
+    
+    const url = `http://localhost:3001/api/share/${documentId}/share`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        email: email.toLowerCase().trim(),
+        accessLevel: accessLevel
+      })
+    });
+
+    console.log('Response status:', response.status);
+    
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || result.errors?.[0]?.message || 'Failed to share document');
+    }
+
+    console.log('Share successful!');
+    
+    return {
+      success: true,
+      message: result.message || "Document shared successfully!",
+      data: result
+    };
+
+  } catch (error: any) {
+    console.error('Share error:', error);
+    return {
+      success: false,
+      message: error.message || "Failed to share document"
+    };
+  }
+};
+
   return {
     saveDocument,
     getDocuments,
-    deleteDocument,
     updateDocument,
-    getDocumentById
+    deleteDocument,
+    getDocumentById,
+    shareDocument,
+    documentsData: documentsData?.myDocuments || [],
+    documentsLoading,
+    documentsError
   };
 };
