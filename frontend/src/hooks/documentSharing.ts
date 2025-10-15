@@ -25,7 +25,7 @@ export const useDocumentSharing = () => {
 
   const handleShareDocument = async (
     emails: string[], 
-    permission: 'view' | 'edit', 
+    permission: 'read' | 'edit',
     documents?: Document[],
     onDocumentsUpdate?: (docs: Document[]) => void
   ): Promise<{ success: boolean; message: string }> => {
@@ -34,7 +34,12 @@ export const useDocumentSharing = () => {
     }
 
     try {   
-      console.log('Starting to share document:', selectedDocument.id, 'with emails:', emails);
+      console.log('share document:', {
+        documentId: selectedDocument.id,
+        documentTitle: selectedDocument.title,
+        emails: emails,
+        permission: permission
+    });
       
       const results: ShareResult[] = [];
       
@@ -80,7 +85,6 @@ export const useDocumentSharing = () => {
           success: true, 
           message: `Document shared successfully with ${emails.join(', ')}!` 
         };
-        console.log('Returning success:', result);
         return result;
       } else {
         const failedEmails = emails.filter((_, index) => index < results.length && !results[index]?.success);

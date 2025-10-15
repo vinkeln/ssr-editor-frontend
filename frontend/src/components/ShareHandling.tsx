@@ -7,12 +7,12 @@ interface ShareHandlingProps {
     document: Document;
     isOpen: boolean;
     onClose: () => void; // Function to close the share dialog.
-    onShare: (emails: string[], permission: 'view' | 'edit') => Promise<{ success: boolean; message: string }>;
+    onShare: (emails: string[], permission: 'read' | 'edit') => Promise<{ success: boolean; message: string }>;
 }
 
 function ShareHandling({ document, isOpen, onClose, onShare }: ShareHandlingProps) {
     const [emails, setEmails] = useState<string>('');
-    const [permission, setPermission] = useState<'view' | 'edit'>('view');
+    const [permission, setPermission] = useState<'read' | 'edit'>('read');
     const [isSharing, setIsSharing] = useState(false);
     const [error, setError] = useState('');
 
@@ -44,7 +44,7 @@ function ShareHandling({ document, isOpen, onClose, onShare }: ShareHandlingProp
         setError('');
         
         try {
-            console.log('Calling onShare with:', {
+            console.log(' on Share with:', {
                 emails: emailList,
                 permission: permission,
                 documentId: document.id
@@ -109,11 +109,11 @@ function ShareHandling({ document, isOpen, onClose, onShare }: ShareHandlingProp
                         <div className="permission-buttons">
                             <button
                                 type="button"
-                                className={`permission-button ${permission === 'view' ? 'active' : ''}`}
-                                onClick={() => setPermission('view')}
+                                className={`permission-button ${permission === 'read' ? 'active' : ''}`}
+                                onClick={() => setPermission('read')}
                                 disabled={isSharing}
                             >
-                                View
+                                read
                             </button>
                             <button
                                 type="button"
