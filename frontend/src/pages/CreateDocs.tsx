@@ -49,22 +49,22 @@ function CreateDocs() {
         setIsSaving(true);
 
     try {
-            if (isEditMode && editingDocId !== null) {
-                const success = await updateDocument(editingDocId, documentTitle, htmlContent);
-                if (success) {
-                    alert("Document updated successfully!");
-                } else {
-                    alert("Failed to update document - you may not have permission");
-                    return;
-                }
+        if (isEditMode && editingDocId) {
+            const updatedDoc = await updateDocument(editingDocId, documentTitle, htmlContent);
+            if (updatedDoc) {
+                alert("Document updated successfully!");
             } else {
-                const result = await saveDocument(documentTitle, editorState);
-                if (!result) {
-                    alert("Failed to save document");
-                    return;
-                }
-                alert("Document saved successfully!");
+                alert("Failed to update document - you may not have permission");
+                return;
             }
+        } else {
+            const savedDoc = await saveDocument(documentTitle, editorState);
+            if (!savedDoc) {
+                alert("Failed to save document");
+                return;
+            }
+            alert("Document saved successfully!");
+        }
 
             setDocumentTitle("Untitled Document");
             setEditorState(EditorState.createEmpty());

@@ -1,5 +1,4 @@
 /* Saved documents with localStorage page */
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Document } from "../types/document";
