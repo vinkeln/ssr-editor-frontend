@@ -13,6 +13,7 @@ Folder-structure
 Commands
 - npm test (Run tests)
 - npm run test:run (Runs the test one time)
+-npm run test (Runs all the tests)
 
 vite.config.ts
 - Vitest configuration 
