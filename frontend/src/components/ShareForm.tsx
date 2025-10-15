@@ -17,7 +17,7 @@ function ShareForm({ documents, onDocumentsUpdate }: ShareFormProps) {
     shareDocument
   } = useDocumentSharing();
 
-  const handleShareDocument = async (emails: string[], permission: 'view' | 'edit') => {
+  const handleShareDocument = async (emails: string[], permission: 'read' | 'edit') => {
     return await shareDocument(emails, permission, documents, onDocumentsUpdate);
   };
 

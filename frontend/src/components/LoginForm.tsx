@@ -35,8 +35,8 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
 
             const userData = {
             userId,
-            email: email, // från inmatningen
-            name: "",     // om du inte har namn i svaret
+            email: email,
+            name: "",
             };
 
             localStorage.setItem('user', JSON.stringify(userData));
@@ -53,7 +53,6 @@ export default function LoginForm({ backendUrl }: LoginFormProps) {
         } catch (err: any) {
              console.error('Login error:', err);
             
-            // Better error handling like in RegisterForm
             if (err.code === 'NETWORK_ERROR' || err.code === 'ECONNREFUSED') {
                 setError('Cannot connect to server. Make sure backend is running.');
             } else {
