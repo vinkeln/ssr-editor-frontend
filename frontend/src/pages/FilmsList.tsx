@@ -1,49 +1,36 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client/react";
+import { GET_FILMS } from "../graphQL/queries";
 
 interface Film {
-  _id?: string;
-  title?: string;
-  [key: string]: unknown; // fallback if your films have other fields
+  id: string;
+  title: string;
+  director: string;
+  year: string;
+  genre: string;
+}
+
+interface GetFilmsData {
+  films: Film[];
 }
 
 function FilmsList() {
-  const [films, setFilms] = useState<Film[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchFilms = async () => {
-      try {
-        const response = await fetch("/api/films");
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Fetched films:", data);
-        setFilms(data);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFilms();
-  }, []);
+  const { loading, error, data } = useQuery<GetFilmsData>(GET_FILMS);
 
   if (loading) return <p>Loading films...</p>;
-  if (error) return <p>Error fetching films: {error}</p>;
+  if (error) return <p>Error fetching films: {error.message}</p>;
+
+  const films = data?.films || [];
 
   return (
-    <div>
-      <h2>Films from API</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-3">Films (GraphQL)</h2>
       {films.length === 0 ? (
         <p>No films found.</p>
       ) : (
-        <ul>
-          {films.map((film, index) => (
-            <li key={film._id || index}>
-              {film.title ?? "Untitled film"}
+        <ul className="space-y-2">
+          {films.map((film) => (
+            <li key={film.id} className="border-b py-2">
+              🎬 <strong>{film.title}</strong> ({film.year}) — {film.director}
             </li>
           ))}
         </ul>
