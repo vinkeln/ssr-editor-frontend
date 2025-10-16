@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { data, useLocation, useNavigate } from "react-router-dom";
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import draftToHtml from "draftjs-to-html";
 import DocumentTitleInput from "../components/DocumentTitleInput";
@@ -8,6 +8,7 @@ import ActionButtons from "../components/ActionButtons";
 import "../styles/Create.css";
 import type { Document } from "../types/document";
 import { useDocumentStorage } from "../hooks/documentStorage";
+import { useSocket } from "../hooks/socket";
 
 function CreateDocs() {
     const [documentTitle, setDocumentTitle] = useState<string>("Untitled Document");
@@ -23,6 +24,23 @@ function CreateDocs() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    // Handle editor with socket for real-time collaboration.
+    const handleExternalTextChange = useCallback((data: { html: string; _id: string }) => {
+        console.log('Text change received from other user:', data._id);
+        
+        // Uppdatera editorn med ändringar från andra användare
+        const { contentBlocks, entityMap } = convertFromHTML(data.html);
+        const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
+        setEditorState(EditorState.createWithContent(contentState));
+    }, []);
+
+    // Use socket hook.
+    const { sendTextChange, leavingDoc } = useSocket(
+        editingDocId, 
+        isEditMode, 
+        handleExternalTextChange
+    );
+
     useEffect(() => {
         if (location.state?.editMode && location.state?.document) {
             const doc: Document = location.state.document;
@@ -36,6 +54,17 @@ function CreateDocs() {
             setEditorState(EditorState.createWithContent(contentState));
         }
     }, [location.state, navigate]);
+
+    const handleEditorChange = (newEditorState: EditorState) => {
+        setEditorState(newEditorState);
+
+        // Send text changes via socket if in edit mode.
+        if (isEditMode) {
+            const contentState = newEditorState.getCurrentContent();
+            const htmlContent = draftToHtml(convertToRaw(contentState));
+            sendTextChange(htmlContent);
+        }
+    };
 
     const handleSave = async () => {        
         if (!documentTitle.trim()) {
@@ -66,6 +95,11 @@ function CreateDocs() {
             alert("Document saved successfully!");
         }
 
+        // Leave document room when saved and reset state.
+        if (isEditMode && editingDocId) {
+            leavingDoc();
+        }
+
             setDocumentTitle("Untitled Document");
             setEditorState(EditorState.createEmpty());
             setIsEditMode(false);
@@ -85,6 +119,12 @@ function CreateDocs() {
         : "Are you sure you want to cancel? All changes will be lost.";
         
     if (window.confirm(message)) {
+
+        if (isEditMode && editingDocId) {
+            // Leave document room when cancelling edit.
+            leavingDoc();
+        }
+
         setDocumentTitle("Untitled Document");
         setEditorState(EditorState.createEmpty());
         setIsEditMode(false);
@@ -115,7 +155,7 @@ function CreateDocs() {
 
                 <RichTextEditor
                     editorState={editorState}
-                    onEditorStateChange={setEditorState}
+                    onEditorStateChange={handleEditorChange}
                 />
             </div>
         </div>
