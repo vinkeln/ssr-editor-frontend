@@ -11,6 +11,7 @@ export interface Document {
   id: string;
   title: string;
   content: string;
+  type?: 'text' | 'code';
   createdAt: string;
   updatedAt?: string;
   ownerId?: string;
@@ -33,12 +34,11 @@ export const useDocumentStorage = () => {
   const [getDocumentByIdQuery] = useLazyQuery<{ document: Document }>(GET_DOCUMENT_BY_ID);
   
 
-  const saveDocument = async (title: string, editorState: EditorState): Promise<Document | null> => {
+  const saveDocument = async (title: string, content: string, type: 'text' | 'code' = 'text'): Promise<Document | null> => {
     try {
-      const htmlContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-      console.log('Saving document variables:', { title: title.trim(), content: htmlContent });
+      console.log('Saving document variables:', { title: title.trim(), content, type });
       const { data } = await createDocumentMutation({
-        variables: { title: title.trim(), content: htmlContent },
+        variables: { title: title.trim(), content, type },
       });
       return data?.createDocument || null;
     } catch (error) {
@@ -55,7 +55,6 @@ export const useDocumentStorage = () => {
     try {
       console.log('🔍 getDocuments - Starting...');
       
-      // ⚠️ KORREKT SYNTAX: Anropa båda queries separat
       console.log('🔍 Calling myDocuments query...');
       const ownedResult = await getDocumentsQuery();
       
@@ -77,11 +76,12 @@ export const useDocumentStorage = () => {
     }
   };
 
-  const updateDocument = async (id: string, title: string, content: string): Promise<Document | null> => {
+  const updateDocument = async (id: string, title: string, content: string, type?: 'text' | 'code'): Promise<Document | null> => {
     try {
       const { data } = await updateDocumentMutation({
-        variables: { id, title, content },
+        variables: { id, title, content, type },
       });
+
       return data?.updateDocument || null;
     } catch (error) {
       console.error("Error updating document (GraphQL):", error);
