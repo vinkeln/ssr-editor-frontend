@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Header, Footer } from "./includes";
 import { ApolloProvider } from '@apollo/client/react'; // Apollo React integration.
 import { apolloClient } from "./lib/apolloClient" // Apollo client instance.
-import { HomePage, CreateDocs, SavedDocs, FilmsList, Register, Login } from "./imports";
+import { HomePage, CreateDocs, SavedDocs, Register, Login } from "./imports";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/App.css";
 
@@ -24,7 +24,6 @@ function App() {
           </ProtectedRoute>
           } 
         />
-          <Route path="/films" element={<FilmsList />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Routes>

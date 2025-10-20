@@ -86,14 +86,6 @@ export default function Header() {
                 Saved Documents
             </Button>
 
-            <Button 
-                component={Link}
-                to="/films"
-                className="header-button"
-            >
-                Films
-            </Button>
-
             {user ? (
                     <>
                         <a
