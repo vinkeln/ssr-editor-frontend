@@ -24,7 +24,7 @@ export const GET_MY_DOCUMENTS = gql`
 // Mutation to create a new document.
 // Mutation = GraphQL version of POST/PUT/DELETE.
 export const CREATE_DOCUMENT = gql`
-  mutation CreateDocument($title: String!, $content: String!, $type: String!) {
+  mutation CreateDocument($title: String!, $content: String!, $type: DocumentTypeEnum!) {
       createDocument(title: $title, content: $content, type: $type) {
           id
           title
@@ -39,7 +39,7 @@ export const CREATE_DOCUMENT = gql`
 
 // Mutation to update an existing document.
 export const UPDATE_DOCUMENT = gql`
-  mutation UpdateDocument($id: ID!, $title: String, $content: String, $type: String) {
+  mutation UpdateDocument($id: ID!, $title: String, $content: String, $type: DocumentTypeEnum) {
       updateDocument(id: $id, title: $title, content: $content, type: $type) {
           id
           title
@@ -95,21 +95,6 @@ export const GET_DOCUMENT_BY_ID = gql`
   }
 `;
 
-
-// Get all movies.
-export const GET_FILMS = gql`
-  query GetFilms {
-    films {
-      id
-      title
-      director
-      year
-      genre
-    }
-  }
-`;
-
-// Lägg till i queries.ts
 export const TEST_SIMPLE_MUTATION = gql`
   mutation TestSimpleMutation {
     createDocument(title: "Test Document", content: "Test content") {
