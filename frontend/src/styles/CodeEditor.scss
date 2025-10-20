@@ -21,17 +21,15 @@
 
     .run-button {
         background: #4b6cb7;
-        color: white;
         border: none;
         padding: 0.6rem 1.2rem;
         border-radius: 4px;
         cursor: pointer;
         font-size: 14px;
         font-weight: bold;
-        transition: background 0.3s;
 
         &:hover:not(:disabled) {
-            background: #4b6cb7;
+            background: #2d4474;
         }
 
         &:disabled {
@@ -51,14 +49,14 @@
 
         h4 {
             margin: 0 0 0.5rem 0;
-            color: #4b6cb7;
+            color: #7ca3fe;
         }
 
         pre {
             margin: 0;
             white-space: pre-wrap;
             font-family: 'Courier New', Consolas, monospace;
-            font-size: 14px;
+            font-size: 16px;
             line-height: 1.5;
         }
     }
