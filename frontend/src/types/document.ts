@@ -18,4 +18,13 @@ interface SharedUser {
   status: 'pending' | 'accepted'; // pending = invitation not accepted yet.
 }
 
+export type DocumentType = 'text' | 'code';
+
+export const mapTypeToEnum = (type: DocumentType) => {
+  switch(type) {
+    case 'text': return 'TEXT';
+    case 'code': return 'CODE';
+  }
+};
+
 export type { Document, SharedUser };
