@@ -2,6 +2,7 @@ interface Document {
     id: string;
     title: string;
     content: string;
+    type?: 'text' | 'code';
     createdAt: string;
     userId: string;
     sharedWith?: SharedUser[];
