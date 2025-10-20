@@ -1,11 +1,17 @@
 /* Custom hook for managing documents via GraphQL */
-import { EditorState, convertToRaw } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
 import { useMutation, useLazyQuery, } from "@apollo/client/react";
 import { 
   CREATE_DOCUMENT, UPDATE_DOCUMENT, DELETE_DOCUMENT, GET_MY_DOCUMENTS, 
   GET_DOCUMENT_BY_ID, GET_SHARED_DOCUMENTS
 } from "../graphQL/queries";
+import type { DocumentType } from '../types/document';
+
+const mapTypeToEnum = (type: DocumentType) => {
+  switch(type) {
+    case 'text': return 'TEXT';
+    case 'code': return 'CODE';
+  }
+};
 
 export interface Document {
   id: string;
@@ -34,40 +40,35 @@ export const useDocumentStorage = () => {
   const [getDocumentByIdQuery] = useLazyQuery<{ document: Document }>(GET_DOCUMENT_BY_ID);
   
 
-  const saveDocument = async (title: string, content: string, type: 'text' | 'code' = 'text'): Promise<Document | null> => {
-    try {
-      console.log('Saving document variables:', { title: title.trim(), content, type });
-      const { data } = await createDocumentMutation({
-        variables: { title: title.trim(), content, type },
-      });
-      return data?.createDocument || null;
-    } catch (error) {
-      console.error(" Error saving document (GraphQL):", error);
-      if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
-      return null;
-    }
-  };
+  const saveDocument = async (title: string, content: string, type: DocumentType = 'text'): Promise<Document | null> => {
+  try {
+    const typeEnum = mapTypeToEnum(type);
+    console.log('Saving document variables:', { title: title.trim(), content, type });
+    const { data } = await createDocumentMutation({
+      variables: { title: title.trim(), content, type: typeEnum },
+    });
+    return data?.createDocument || null;
+  } catch (error) {
+    console.error("Error saving document (GraphQL):", error);
+    return null;
+  }
+};
 
   const getDocuments = async (): Promise<{ owned: Document[]; shared: Document[]; total: number }> => {
-    try {
-      console.log('🔍 getDocuments - Starting...');
-      
-      console.log('🔍 Calling myDocuments query...');
+    try {      
+      console.log('Calling myDocuments query...');
       const ownedResult = await getDocumentsQuery();
       
-      console.log('🔍 Calling sharedDocuments query...');
+      console.log('Calling sharedDocuments query...');
       const sharedResult = await getSharedDocumentsQuery();
       
-      console.log('🔍 myDocuments result:', ownedResult);
-      console.log('🔍 sharedDocuments result:', sharedResult);
+      console.log('myDocuments result:', ownedResult);
+      console.log('sharedDocuments result:', sharedResult);
       
       const owned = ownedResult.data?.myDocuments || [];
       const shared = sharedResult.data?.sharedDocuments || [];
       
-      console.log('🔍 Final counts - Owned:', owned.length, 'Shared:', shared.length);
+      console.log('Final counts - Owned:', owned.length, 'Shared:', shared.length);
       
       return { owned, shared, total: owned.length + shared.length };
     } catch (error) {
@@ -78,10 +79,10 @@ export const useDocumentStorage = () => {
 
   const updateDocument = async (id: string, title: string, content: string, type?: 'text' | 'code'): Promise<Document | null> => {
     try {
+      const typeEnum = type ? mapTypeToEnum(type) : undefined;
       const { data } = await updateDocumentMutation({
-        variables: { id, title, content, type },
-      });
-
+      variables: { id, title, content, type: typeEnum },
+    });
       return data?.updateDocument || null;
     } catch (error) {
       console.error("Error updating document (GraphQL):", error);
