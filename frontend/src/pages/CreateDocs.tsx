@@ -5,6 +5,7 @@ import draftToHtml from "draftjs-to-html";
 import DocumentTitleInput from "../components/DocumentTitleInput";
 import RichTextEditor from "../components/TextEditor";
 import ActionButtons from "../components/ActionButtons";
+import CodeEditor from "../components/CodeEditor";
 import "../styles/Create.css";
 import type { Document } from "../types/document";
 import { useDocumentStorage } from "../hooks/documentStorage";
@@ -15,10 +16,11 @@ function CreateDocs() {
     const [editorState, setEditorState] = useState<EditorState>(
         EditorState.createEmpty()
     );
-    const [ isEditMode, setIsEditMode ] = useState<boolean>(false);
+    const [codeContent, setCodeContent] = useState<string>("");
+    const [documentType, setDocumentType] = useState<"text" | "code">("text");
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [editingDocId, setEditingDocId] = useState<string | null>(null);
-
-    const [isSaving, setIsSaving] = useState<boolean>(false)
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const { saveDocument, updateDocument } = useDocumentStorage();
     const location = useLocation();
@@ -29,10 +31,14 @@ function CreateDocs() {
         console.log('Text change received from other user:', data._id);
         
         // Uppdatera editorn med ändringar från andra användare
+        if (documentType === "text") {
         const { contentBlocks, entityMap } = convertFromHTML(data.html);
         const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
         setEditorState(EditorState.createWithContent(contentState));
-    }, []);
+        } else {
+            setCodeContent(data.html);
+        }
+    }, [documentType]);
 
     // Use socket hook.
     const { sendTextChange, leavingDoc } = useSocket(
@@ -48,10 +54,15 @@ function CreateDocs() {
             setDocumentTitle(doc.title);
             setIsEditMode(true);
             setEditingDocId(doc.id);
+            setDocumentType((doc as { type?: "text" | "code" }).type || "text");
 
+            if ((doc as { type?: "text" | "code" }).type === "code") {
+                setCodeContent(doc.content);
+            } else {
             const { contentBlocks, entityMap } = convertFromHTML(doc.content);
             const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
             setEditorState(EditorState.createWithContent(contentState));
+        }
         }
     }, [location.state, navigate]);
 
@@ -66,20 +77,38 @@ function CreateDocs() {
         }
     };
 
+    const handleCodeChange = (value: string) => {
+        setCodeContent(value);
+
+        if (isEditMode) {
+            sendTextChange(value);
+        }
+    };
+    
+    const toggleDocumentType = () => {
+        const newType = documentType === "text" ? "code" : "text";
+        setDocumentType(newType);
+    };
+
     const handleSave = async () => {        
         if (!documentTitle.trim()) {
             alert("Please enter a document title.");
             return;
         }
         
-        const contentState = editorState.getCurrentContent();
-        const htmlContent = draftToHtml(convertToRaw(contentState));
+        let content: string;
+        if (documentType === "code") {
+            content = codeContent;
+        } else {
+            const contentState = editorState.getCurrentContent();
+            content = draftToHtml(convertToRaw(contentState));
+        }
 
         setIsSaving(true);
 
     try {
         if (isEditMode && editingDocId) {
-            const updatedDoc = await updateDocument(editingDocId, documentTitle, htmlContent);
+            const updatedDoc = await updateDocument(editingDocId, documentTitle, content, documentType);
             if (updatedDoc) {
                 alert("Document updated successfully!");
             } else {
@@ -87,7 +116,7 @@ function CreateDocs() {
                 return;
             }
         } else {
-            const savedDoc = await saveDocument(documentTitle, editorState);
+            const savedDoc = await saveDocument(documentTitle, content, documentType);
             if (!savedDoc) {
                 alert("Failed to save document");
                 return;
@@ -102,6 +131,8 @@ function CreateDocs() {
 
             setDocumentTitle("Untitled Document");
             setEditorState(EditorState.createEmpty());
+            setCodeContent("");
+            setDocumentType("text");
             setIsEditMode(false);
             setEditingDocId(null);
             navigate('/saved');
@@ -127,6 +158,8 @@ function CreateDocs() {
 
         setDocumentTitle("Untitled Document");
         setEditorState(EditorState.createEmpty());
+        setCodeContent("");
+        setDocumentType("text");
         setIsEditMode(false);
         setEditingDocId(null);
         
@@ -144,7 +177,13 @@ function CreateDocs() {
                     onTitleChange={setDocumentTitle} 
                 />
             </div>
-            
+
+            <div className="document-type-toggle">
+                <button onClick={toggleDocumentType} className="toggle-button">
+                    {documentType === "text" ? "Code Editor 💻" : "Rich Text Editor 📝"}
+                </button>
+            </div>
+
             <div className="editor-section">
                 <ActionButtons 
                     onSave={handleSave}
@@ -153,10 +192,17 @@ function CreateDocs() {
                     isSaving={isSaving}
                 />
 
-                <RichTextEditor
-                    editorState={editorState}
-                    onEditorStateChange={handleEditorChange}
-                />
+                {documentType === "text" ? (
+                    <RichTextEditor
+                        editorState={editorState}
+                        onEditorStateChange={handleEditorChange}
+                    />
+                ) : (
+                    <CodeEditor
+                        value={codeContent}
+                        onChange={handleCodeChange}
+                    />
+                )}
             </div>
         </div>
     );
