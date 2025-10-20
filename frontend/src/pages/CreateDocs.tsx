@@ -180,11 +180,11 @@ function CreateDocs() {
 
             <div className="document-type-toggle">
                 <button onClick={toggleDocumentType} className="toggle-button">
-                    {documentType === "text" ? "Code Editor 💻" : "Rich Text Editor 📝"}
+                    {documentType === "text" ? "Code Editor " : "Text Editor 📝"}
                 </button>
             </div>
 
-            <div className="editor-section">
+            <div className="">
                 <ActionButtons 
                     onSave={handleSave}
                     onCancel={handleCancel}
