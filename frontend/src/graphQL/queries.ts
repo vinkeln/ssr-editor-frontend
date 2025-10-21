@@ -8,6 +8,7 @@ export const GET_MY_DOCUMENTS = gql`
       id
       title
       content
+      type
       createdAt
       updatedAt
       ownerId
@@ -24,7 +25,7 @@ export const GET_MY_DOCUMENTS = gql`
 // Mutation to create a new document.
 // Mutation = GraphQL version of POST/PUT/DELETE.
 export const CREATE_DOCUMENT = gql`
-  mutation CreateDocument($title: String!, $content: String!, $type: DocumentTypeEnum!) {
+  mutation CreateDocument($title: String!, $content: String!, $type: String!) {
       createDocument(title: $title, content: $content, type: $type) {
           id
           title
@@ -39,7 +40,7 @@ export const CREATE_DOCUMENT = gql`
 
 // Mutation to update an existing document.
 export const UPDATE_DOCUMENT = gql`
-  mutation UpdateDocument($id: ID!, $title: String, $content: String, $type: DocumentTypeEnum) {
+  mutation UpdateDocument($id: ID!, $title: String, $content: String, $type: String) {
       updateDocument(id: $id, title: $title, content: $content, type: $type) {
           id
           title
@@ -65,6 +66,7 @@ export const GET_SHARED_DOCUMENTS = gql`
       id
       title
       content
+      type
       createdAt
       updatedAt
       ownerId
@@ -84,6 +86,7 @@ export const GET_DOCUMENT_BY_ID = gql`
       id
       title
       content
+      type
       createdAt
       updatedAt
       ownerId

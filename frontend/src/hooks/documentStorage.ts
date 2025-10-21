@@ -7,9 +7,10 @@ import {
 import type { DocumentType } from '../types/document';
 
 const mapTypeToEnum = (type: DocumentType) => {
-  switch(type) {
+  switch (type) {
     case 'text': return 'TEXT';
     case 'code': return 'CODE';
+    default: return 'TEXT';
   }
 };
 
@@ -43,7 +44,12 @@ export const useDocumentStorage = () => {
   const saveDocument = async (title: string, content: string, type: DocumentType = 'text'): Promise<Document | null> => {
   try {
     const typeEnum = mapTypeToEnum(type);
-    console.log('Saving document variables:', { title: title.trim(), content, type });
+    console.log('Saving document variables:', { 
+      title: title.trim(), 
+      content, 
+      typeOriginal: type, 
+      typeEnumSent: typeEnum 
+    });
     const { data } = await createDocumentMutation({
       variables: { title: title.trim(), content, type: typeEnum },
     });
