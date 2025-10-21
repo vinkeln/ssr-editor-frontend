@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { data, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import draftToHtml from "draftjs-to-html";
 import DocumentTitleInput from "../components/DocumentTitleInput";
@@ -54,15 +54,16 @@ function CreateDocs() {
             setDocumentTitle(doc.title);
             setIsEditMode(true);
             setEditingDocId(doc.id);
-            setDocumentType((doc as { type?: "text" | "code" }).type || "text");
 
-            if ((doc as { type?: "text" | "code" }).type === "code") {
+            const docType = (doc as { type?: "text" | "code" }).type || "text";
+            setDocumentType("text"); // Default to text editor.
+            if (docType === "code") {
                 setCodeContent(doc.content);
             } else {
-            const { contentBlocks, entityMap } = convertFromHTML(doc.content);
-            const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
-            setEditorState(EditorState.createWithContent(contentState));
-        }
+                const { contentBlocks, entityMap } = convertFromHTML(doc.content);
+                const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
+                setEditorState(EditorState.createWithContent(contentState));
+            }
         }
     }, [location.state, navigate]);
 
@@ -95,20 +96,22 @@ function CreateDocs() {
             alert("Please enter a document title.");
             return;
         }
+
+        const typeToSave = documentType === "code" ? "code" : "text";
         
         let content: string;
-        if (documentType === "code") {
+        if (typeToSave === "code") {
             content = codeContent;
         } else {
             const contentState = editorState.getCurrentContent();
-            content = draftToHtml(convertToRaw(contentState));
+            content = draftToHtml(convertToRaw(contentState)); // Convert to HTML.
         }
 
         setIsSaving(true);
 
     try {
         if (isEditMode && editingDocId) {
-            const updatedDoc = await updateDocument(editingDocId, documentTitle, content, documentType);
+            const updatedDoc = await updateDocument(editingDocId, documentTitle, content, typeToSave);
             if (updatedDoc) {
                 alert("Document updated successfully!");
             } else {
@@ -116,7 +119,7 @@ function CreateDocs() {
                 return;
             }
         } else {
-            const savedDoc = await saveDocument(documentTitle, content, documentType);
+            const savedDoc = await saveDocument(documentTitle, content, typeToSave);
             if (!savedDoc) {
                 alert("Failed to save document");
                 return;
@@ -132,7 +135,6 @@ function CreateDocs() {
             setDocumentTitle("Untitled Document");
             setEditorState(EditorState.createEmpty());
             setCodeContent("");
-            setDocumentType("text");
             setIsEditMode(false);
             setEditingDocId(null);
             navigate('/saved');
@@ -180,7 +182,7 @@ function CreateDocs() {
 
             <div className="document-type-toggle">
                 <button onClick={toggleDocumentType} className="toggle-button">
-                    {documentType === "text" ? "Code Editor " : "Text Editor 📝"}
+                    {documentType === "text" ? "Code Editor" : "Text Editor"}
                 </button>
             </div>
 
