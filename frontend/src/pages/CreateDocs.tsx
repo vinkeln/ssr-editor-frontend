@@ -30,7 +30,6 @@ function CreateDocs() {
     const handleExternalTextChange = useCallback((data: { html: string; _id: string }) => {
         console.log('Text change received from other user:', data._id);
         
-        // Uppdatera editorn med ändringar från andra användare
         if (documentType === "text") {
         const { contentBlocks, entityMap } = convertFromHTML(data.html);
         const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
