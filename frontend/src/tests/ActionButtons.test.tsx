@@ -16,7 +16,7 @@ describe('ActionButtons', () => {
     );
 
     expect(screen.getByText('Save')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
+    expect(screen.getByText('Reset')).toBeInTheDocument();
   });
 
   it('calls onSave when save button is clicked', () => {
@@ -47,7 +47,7 @@ describe('ActionButtons', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('Cancel'));
+    fireEvent.click(screen.getByText('Reset'));
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -113,7 +113,7 @@ describe('ActionButtons', () => {
 
     const container = screen.getByText('Save').parentElement;
     const saveButton = screen.getByText('Save');
-    const cancelButton = screen.getByText('Cancel');
+    const cancelButton = screen.getByText('Reset');
 
     expect(container).toHaveClass('button-section');
     expect(saveButton).toHaveClass('save-button');
