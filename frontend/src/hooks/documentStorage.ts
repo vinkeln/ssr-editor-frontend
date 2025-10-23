@@ -78,7 +78,6 @@ export const useDocumentStorage = () => {
       
       return { owned, shared, total: owned.length + shared.length };
     } catch (error) {
-      console.error("Error fetching documents (GraphQL):", error);
       return { owned: [], shared: [], total: 0 };
     }
   };
@@ -115,12 +114,12 @@ export const useDocumentStorage = () => {
     }
   };
 
- const shareDocument = async (documentId: string, email: string, accessLevel: "read" | "edit") => {
+ const shareDocument = async (documentId: string, email: string, permission: "read" | "edit") => {
   try {
     console.log('sharing with Mailgun:', { 
       documentId, 
       email: email.toLowerCase().trim(), 
-      accessLevel 
+      permission
     });
 
     const token = localStorage.getItem('token');
@@ -135,7 +134,7 @@ export const useDocumentStorage = () => {
       },
       body: JSON.stringify({
         email: email.toLowerCase().trim(),
-        accessLevel: accessLevel
+        permission: permission
       })
     });
 
