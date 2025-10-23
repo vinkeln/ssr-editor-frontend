@@ -22,7 +22,7 @@ function ActionButtons({ onSave, onCancel, isSaveDisabled, isSaving }: ActionBut
         onClick={onCancel}
         className="cancel-button"
       >
-        Cancel
+        Reset
       </button>
     </div>
   );
