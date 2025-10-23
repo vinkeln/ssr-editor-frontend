@@ -6,7 +6,9 @@ import DocumentTitleInput from "../components/DocumentTitleInput";
 import RichTextEditor from "../components/TextEditor";
 import ActionButtons from "../components/ActionButtons";
 import CodeEditor from "../components/CodeEditor";
+import CommentSystem from "../components/CommentSystem";
 import "../styles/Create.css";
+import "../styles/Comments.scss";
 import type { Document } from "../types/document";
 import { useDocumentStorage } from "../hooks/documentStorage";
 import { useSocket } from "../hooks/socket";
@@ -21,6 +23,7 @@ function CreateDocs() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [editingDocId, setEditingDocId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [showComments, setShowComments] = useState<boolean>(false);
 
     const { saveDocument, updateDocument } = useDocumentStorage();
     const location = useLocation();
@@ -45,6 +48,32 @@ function CreateDocs() {
         isEditMode, 
         handleExternalTextChange
     );
+
+    // Get current user info for comments.
+    const getCurrentUser = () => {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+           return {
+                userId: payload.userId,
+                userEmail: payload.email
+            };
+        } catch (error) {
+            console.error('Error parsing token:', error);
+            return null;
+        }
+    };
+
+    // Get document content for comments system.
+    const getDocumentContent = (): string => {
+        if (documentType === "text") {
+            const contentState = editorState.getCurrentContent();
+            return draftToHtml(convertToRaw(contentState));
+        }
+        return "";
+    };
 
     useEffect(() => {
         if (location.state?.editMode && location.state?.document) {
@@ -88,6 +117,15 @@ function CreateDocs() {
     const toggleDocumentType = () => {
         const newType = documentType === "text" ? "code" : "text";
         setDocumentType(newType);
+        if (newType === "code") {
+            setShowComments(false); // Hide comments when switching to code editor.
+        }
+    };
+
+    const toggleComments = () => {
+        if (documentType === "text") {
+            setShowComments(!showComments);
+        }
     };
 
     const handleSave = async () => {        
@@ -147,8 +185,8 @@ function CreateDocs() {
 
     const handleCancel = (): void => {
     const message = isEditMode 
-        ? "Are you sure you want to cancel editing? All changes will be lost."
-        : "Are you sure you want to cancel? All changes will be lost.";
+        ? "Are you sure you want to reset? All changes will be lost."
+        : "Are you sure you want to reset? All changes will be lost.";
         
     if (window.confirm(message)) {
 
@@ -163,12 +201,15 @@ function CreateDocs() {
         setDocumentType("text");
         setIsEditMode(false);
         setEditingDocId(null);
+        setShowComments(false);
         
         if (isEditMode) {
             navigate('/saved');
         }
     }
 };
+
+const currentUser = getCurrentUser();
 
     return (
         <div className="create-docs-container">
@@ -185,7 +226,16 @@ function CreateDocs() {
                 </button>
             </div>
 
-            <div className="">
+            {documentType === "text" && editingDocId && (
+                <button 
+                    onClick={toggleComments} 
+                    className={`comments-button ${showComments ? 'active' : ''}`}
+                    >
+                    {showComments ? 'Hide Comments' : 'Show Comments'}
+                </button>
+            )}
+
+            <div>
                 <ActionButtons 
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -194,10 +244,27 @@ function CreateDocs() {
                 />
 
                 {documentType === "text" ? (
-                    <RichTextEditor
-                        editorState={editorState}
-                        onEditorStateChange={handleEditorChange}
-                    />
+                    <>
+                        <div className="editor-comments-container">
+                            <div className="editor-section">
+                                <RichTextEditor
+                                    editorState={editorState}
+                                    onEditorStateChange={handleEditorChange}
+                                />
+                            </div>
+
+                            {showComments && editingDocId && (
+                                <div className="comments-section">
+                                    <CommentSystem 
+                                        documentId={editingDocId}
+                                        documentContent={getDocumentContent()}
+                                        userId={currentUser?.userId ?? ''}
+                                        userEmail={currentUser?.userEmail ?? ''}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </>
                 ) : (
                     <CodeEditor
                         value={codeContent}
