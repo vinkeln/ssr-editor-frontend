@@ -50,10 +50,9 @@ export default function Header() {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         
-        // Uppdatera state
         setUser(null);
         
-        // Redirect till login
+        // Redirect to login.
         navigate('/login');
     };
 
@@ -91,7 +90,7 @@ export default function Header() {
                         <a
                             className="header-button"
                         >   
-                            User: {user.name || user.email}
+                            User: { user.email }
                         </a>
 
                         <Button 
