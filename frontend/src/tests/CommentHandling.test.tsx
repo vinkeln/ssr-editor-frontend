@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { ApolloClient, InMemoryCache } from '@apollo/client'; // imports ApolloClient, InMemoryCache for setting up mock Apollo Client.
+import { ApolloClient, InMemoryCache } from '@apollo/client'; // imports ApolloClient, InMemoryCache for setting up mock Apollo Client
 import { ApolloProvider } from '@apollo/client/react';
 import { MockLink } from '@apollo/client/testing';
 import { useCommentHandling } from '../components/CommentHandling';
