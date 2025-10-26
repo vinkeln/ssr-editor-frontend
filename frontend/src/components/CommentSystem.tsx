@@ -89,9 +89,6 @@ const CommentSystem: React.FC<CommentSystemProps> = ({ documentId, documentConte
                 <div className="comment-input-section">
                     <div className="comment-input-header">
                         <h4>Add Comment to Line {selectedLine + 1}</h4>
-                        <button className="cancel-comment-button" onClick={handleCancelComment}>
-                            × {/* Better close icon */}
-                        </button>
                     </div>
                     <textarea
                         value={newComment}
