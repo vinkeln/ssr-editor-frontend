@@ -3,16 +3,17 @@ interface ActionButtonsProps { // Props for the ActionButtons component
   onSave: () => void;
   onCancel: () => void;
   isSaveDisabled: boolean;
+  isSaving?: boolean;
 }
 
 // ActionButtons component definition with save and cancel buttons.
-function ActionButtons({ onSave, onCancel, isSaveDisabled }: ActionButtonsProps) {
+function ActionButtons({ onSave, onCancel, isSaveDisabled, isSaving }: ActionButtonsProps) {
   return (
     <div className="button-section">
       <button
         onClick={onSave}
         className="save-button"
-        disabled={isSaveDisabled}
+        disabled={isSaveDisabled || isSaving}
       >
         Save
       </button>
@@ -21,7 +22,7 @@ function ActionButtons({ onSave, onCancel, isSaveDisabled }: ActionButtonsProps)
         onClick={onCancel}
         className="cancel-button"
       >
-        Cancel
+        Reset
       </button>
     </div>
   );

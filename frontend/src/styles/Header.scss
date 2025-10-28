@@ -1,0 +1,45 @@
+/* Styling component for Header.tsx */
+.header {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between; // Space between title and nav links
+    background: linear-gradient(to right, #4b6cb7 0%, #2d4474 100%); // background-color: brighter to darker ->;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-button {
+    color: white;
+    
+    &:hover {
+        color: #f0f0f0;
+    }
+}
+
+.header-title {
+    color: white;
+    font-weight: bold;
+    font-family: Georgia, serif;
+    margin: 0;
+
+    &:hover {
+        transform: scale(1.05);  
+        transition: transform 0.4s;      
+    }
+}
+
+.header-nav .header-button {
+    color: white;
+    font-family: serif;
+
+    &:hover {
+        transform: scale(1.05);  
+        transition: transform 0.4s;
+    }
+}

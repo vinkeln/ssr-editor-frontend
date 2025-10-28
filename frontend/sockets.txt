@@ -1,0 +1,7 @@
+The goal is to write a document i real time with websocets.
+
+1. Install socket.io client
+npm install socket.io-client
+or npm install socket.io-client --force
+
+

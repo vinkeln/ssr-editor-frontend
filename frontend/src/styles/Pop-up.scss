@@ -1,0 +1,156 @@
+/* Styling component for pop-up share dialog */
+.share-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.share-popup {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 420px;
+  max-width: 90%;
+}
+
+.share-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 5px solid #bababa;
+  font-family: Georgia, serif;
+  
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+  }
+}
+
+.share-popup-content {
+  padding: 15px;
+}
+
+.email-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ececec;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 5px;
+  background-color: #ccc;
+  color: black;
+  
+  &:focus {
+    outline: none;
+    border-color: #a4a4a4;
+  }
+}
+
+.input-hint {
+  color: #666;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.permission-section {
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+.permission-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.permission-button {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background: rgb(183, 183, 183);
+  cursor: pointer;
+  font-size: 14px;
+  color: #000000;
+  
+  &:hover {
+    outline: none;
+    border-color: #a4a4a4;
+  }
+  
+  &.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    font-size: 17px;
+  }
+}
+
+// Error message
+.popup-error {
+  background: #ffe6e6;
+  color: #d00;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  border: 1px solid #ffcccc;
+}
+
+// Action buttons
+.popup-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.button-cancel, .button-share {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button-cancel {
+  background: #4b6cb7;
+  color: white;
+  
+  &:hover {
+    background: #2d4474;
+  }
+}
+
+.button-share {
+  background: #4b6cb7;
+  color: white;
+  
+  &:hover {
+    background: #2d4474;
+  }
+  
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

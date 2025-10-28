@@ -92,3 +92,15 @@
   border: 1px solid #000000;
 }
 
+.toggle-button {
+    background-color: #4b6cb7;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 0.6rem;
+}
+
+.toggle-button:hover {
+    background-color: #395998;
+}
