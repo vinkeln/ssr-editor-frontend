@@ -124,7 +124,8 @@ export const useDocumentStorage = () => {
 
     const token = localStorage.getItem('token');
     
-    const url = `http://localhost:3001/api/share/${documentId}/share`;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+    const url = `${backendUrl}/api/share/${documentId}/share`;
     
     const response = await fetch(url, {
       method: 'POST',
