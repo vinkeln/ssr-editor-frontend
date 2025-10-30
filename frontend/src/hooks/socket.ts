@@ -11,7 +11,7 @@ export const useSocket = (
 
     useEffect(() => {
         // Connect to the socket server.
-        socketRef.current = io('http://localhost:3001', {
+        socketRef.current = io('http://:3001', {
             withCredentials: true
         });
 
