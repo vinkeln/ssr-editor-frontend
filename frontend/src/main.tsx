@@ -7,8 +7,8 @@ import App from './App.tsx'
 // Basename is setting all routes under /ssr-editor-frontend
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HashRouter basename="/ssr-editor-frontend">
+    <HashRouter>
       <App />
     </HashRouter>
-  </StrictMode>,
+  </StrictMode>
 )
